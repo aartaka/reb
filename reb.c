@@ -121,11 +121,5 @@ int main (int argc, char **argv)
         else
                 outfile = fopen(argv[2], "w");
         minify_file(infile, outfile);
-        /* fgets(str, 200, stdin); */
-        /* for (int i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i) { */
-        /*         replace_pattern(str, optimizations[i]); */
-        /*         printf("String is: %s", str); */
-        /* } */
-        /* fputs(str, stdout); */
         return EXIT_SUCCESS;
 }
