@@ -40,13 +40,13 @@ struct optimization optimizations[] = {
 
 
 void replace_pattern (char *str, struct optimization opt) {
-        regex_t *reg = malloc(sizeof(regex_t));
+        regex_t reg;
         size_t rmax = 1000;
         regmatch_t rmatch[rmax];
         char buf[10000];
         strcpy(buf, str);
-        regcomp(reg, opt.pattern, 0);
-        while (!regexec(reg, str, rmax, rmatch, 0)) {
+        regcomp(&reg, opt.pattern, 0);
+        while (!regexec(&reg, str, rmax, rmatch, 0)) {
                 size_t buf_idx = 0;
                 for (size_t i = 0; i < strlen(opt.replacement); ++i) {
                         if (opt.replacement[i] < 15) {
