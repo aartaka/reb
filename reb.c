@@ -78,7 +78,7 @@ int minify_file (FILE *infile, FILE *outfile)
 {
         char c;
         while ((c = getc(infile)) != EOF)
-                if(!regmatch("[][+-.,<>!#]", (char[]){c}))
+                if(!regmatch("[][+-.,<>!#]", (char[]){c, 0}))
                         putc(c, outfile);
         return EXIT_SUCCESS;
 }
