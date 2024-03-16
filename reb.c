@@ -58,13 +58,48 @@ void replace_pattern (char *str, struct optimization opt) {
         }
 }
 
+int isbf (char c) {
+        switch(c) {
+        case '+':
+        case '-':
+        case '<':
+        case '>':
+        case ',':
+        case '.':
+        case '[':
+        case ']':
+        case '#':
+        case '!':
+                return 1;
+        default:
+                return 0;
+        }
+}
+
+int minify_file (FILE *infile, FILE *outfile)
+{
+        char c;
+        while ((c = getc(infile)) != EOF)
+                if(isbf(c))
+                        putc(c, outfile);
+}
+
+/* int optimize_file (FILE *infile, FILE *outfile) */
+/* { */
+/*         for (int i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i) { */
+/*                 replace_pattern(str, optimizations[i]); */
+/*                 printf("String is: %s", str); */
+/*         } */
+/* } */
+
 int main (int argc, char **argv)
 {
         char str[200];
-        fgets(str, 200, stdin);
-        for (int i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i) {
-                replace_pattern(str, optimizations[i]);
-                printf("String is: %s", str);
-        }
-        fputs(str, stdout);
+        minify_file(stdin, stdout);
+        /* fgets(str, 200, stdin); */
+        /* for (int i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i) { */
+        /*         replace_pattern(str, optimizations[i]); */
+        /*         printf("String is: %s", str); */
+        /* } */
+        /* fputs(str, stdout); */
 }
