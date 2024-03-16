@@ -105,13 +105,16 @@ int optimize_file (FILE *infile, FILE *outfile)
 
 int main (int argc, char **argv)
 {
+        if (argc == 1
+            || strlen(argv[1]) > 1)
+                printf("Please use reb with commands like 'm' or 'o'");
         FILE *infile;
-        if (argc == 1)
+        if (argc == 2)
                 infile = stdin;
-        else if (argc > 1 && !strcmp(argv[1], "--"))
+        else if (argc > 2 && !strcmp(argv[2], "--"))
                 infile = stdin;
         else
-                infile = fopen(argv[1], "r");
+                infile = fopen(argv[2], "r");
         FILE *outfile;
         if (argc <= 2)
                 outfile = stdout;
@@ -119,6 +122,11 @@ int main (int argc, char **argv)
                 outfile = stdout;
         else
                 outfile = fopen(argv[2], "w");
-        minify_file(infile, outfile);
+        switch (argv[1][0]) {
+        case 'm':
+                return minify_file(infile, outfile);
+        case 'o':
+                return optimize_file(infile, outfile);
+        }
         return EXIT_SUCCESS;
 }
