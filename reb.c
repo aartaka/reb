@@ -100,18 +100,32 @@ int minify_file (FILE *infile, FILE *outfile)
 /* { */
 /*         for (int i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i) { */
 /*                 replace_pattern(str, optimizations[i]); */
-/*                 printf("String is: %s", str); */
 /*         } */
 /* } */
 
 int main (int argc, char **argv)
 {
         char str[200];
-        minify_file(stdin, stdout);
+        FILE *infile;
+        if (argc == 1)
+                infile = stdin;
+        else if (argc > 1 && !strcmp(argv[1], "--"))
+                infile = stdin;
+        else
+                infile = fopen(argv[1], "r");
+        FILE *outfile;
+        if (argc <= 2)
+                outfile = stdout;
+        else if (argc > 2 && !strcmp(argv[2], "--"))
+                outfile = stdout;
+        else
+                outfile = fopen(argv[2], "w");
+        minify_file(infile, outfile);
         /* fgets(str, 200, stdin); */
         /* for (int i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i) { */
         /*         replace_pattern(str, optimizations[i]); */
         /*         printf("String is: %s", str); */
         /* } */
         /* fputs(str, stdout); */
+        return EXIT_SUCCESS;
 }
