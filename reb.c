@@ -107,12 +107,12 @@ int main (int argc, char **argv)
         else
                 infile = fopen(argv[2], "r");
         FILE *outfile;
-        if (argc <= 2)
+        if (argc <= 3)
                 outfile = stdout;
-        else if (argc > 2 && !strcmp(argv[2], "--"))
+        else if (argc > 3 && !strcmp(argv[3], "--"))
                 outfile = stdout;
         else
-                outfile = fopen(argv[2], "w");
+                outfile = fopen(argv[3], "w");
         switch (argv[1][0]) {
         case 'm':
                 return minify_file(infile, outfile);
