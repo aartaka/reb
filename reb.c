@@ -74,11 +74,29 @@ int regmatch(char *pattern, char *string)
         return regexec(&reg, string, rmax, rmatch, 0);
 }
 
+int isbf (char c) {
+        switch(c) {
+        case '+':
+        case '-':
+        case '<':
+        case '>':
+        case ',':
+        case '.':
+        case '[':
+        case ']':
+        case '#':
+        case '!':
+                return 1;
+        default:
+                return 0;
+        }
+}
+
 int minify_file (FILE *infile, FILE *outfile)
 {
         char c;
         while ((c = getc(infile)) != EOF)
-                if(!regmatch("[][+-.,<>!#]", (char[]){c, 0}))
+                if(isbf(c))
                         putc(c, outfile);
         return EXIT_SUCCESS;
 }
