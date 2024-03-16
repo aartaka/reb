@@ -105,7 +105,6 @@ int optimize_file (FILE *infile, FILE *outfile)
 
 int main (int argc, char **argv)
 {
-        char str[200];
         FILE *infile;
         if (argc == 1)
                 infile = stdin;
