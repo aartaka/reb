@@ -55,8 +55,8 @@ void replace_pattern (char *str, struct optimization opt) {
                                 strcpy(buf + buf_idx, str + match.rm_so);
                                 buf_idx += match.rm_eo - match.rm_so;
                         } else if (15 < opt.replacement[i] && opt.replacement[i] < ' ') {
-                                printf("Replacing with length\n");
                                 regmatch_t match = rmatch[opt.replacement[i] - 15];
+                                printf("Replacing with length %d\n", match.rm_eo - match.rm_so);
                                 buf_idx += sprintf(buf + buf_idx, "%d", match.rm_eo - match.rm_so);
                         } else {
                                 printf("Replacing with char %c\n", opt.replacement[i]);
@@ -93,6 +93,7 @@ int minify_file (FILE *infile, FILE *outfile)
         while ((c = getc(infile)) != EOF)
                 if(isbf(c))
                         putc(c, outfile);
+        return EXIT_SUCCESS;
 }
 
 /* int optimize_file (FILE *infile, FILE *outfile) */
