@@ -141,7 +141,7 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
         size_t brackets_[200] = {0};
         size_t *brackets = brackets_;
         for (size_t i = 0; commands[i] != 0;) {
-                /* printf("Command %c\n", commands[i]->command); */
+                /* printf("%c", commands[i]->command); */
                 struct command *command = commands[i];
                 switch (command->command) {
                 case '+':
