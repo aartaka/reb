@@ -229,7 +229,7 @@ int main (int argc, char **argv)
         /* case 'o': */
         /*         return optimize_file(infile, outfile); */
         /* } */
-        struct command **commands = calloc(100, sizeof(void*));
+        struct command **commands = calloc(10000, sizeof(void*));
         parse_file(fopen("test.bf", "r"), commands);
         for (int i = 0; commands[i] != 0; ++i)
                 printf("%s command %c on %d\n",
