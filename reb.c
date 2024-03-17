@@ -109,7 +109,7 @@ int optimize_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         while (fgets(str, 10000, infile)) {
-                for (int i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
+                for (size_t i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
                         replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
         }
