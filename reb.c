@@ -35,15 +35,16 @@ struct optimization optimizations[] = {
         {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '?'}}
 };
 
+#define withreg(regvar, max, matchvar, ...) \
+        regex_t regvar;                        \
+        regmatch_t rmatch[max];             \
+        regcomp(&regvar, __VA_ARGS__, 0);
 
 void replace_pattern (char *str, struct optimization opt) {
-        regex_t reg;
-        size_t rmax = 1000;
-        regmatch_t rmatch[rmax];
+        withreg(reg, 1000, rmatch, opt.pattern);
         char buf[10000];
         strcpy(buf, str);
-        regcomp(&reg, opt.pattern, 0);
-        while (!regexec(&reg, str, rmax, rmatch, 0)) {
+        while (!regexec(&reg, str, 1000, rmatch, 0)) {
                 size_t buf_idx = 0;
                 for (size_t i = 0; i < strlen(opt.replacement); ++i) {
                         if (opt.replacement[i] < 15) {
@@ -64,13 +65,10 @@ void replace_pattern (char *str, struct optimization opt) {
 
 int minify_file (FILE *infile, FILE *outfile)
 {
-        regex_t reg;
-        regcomp(&reg, "[][+-.,<>!#]", 0);
-        size_t rmax = 3;
-        regmatch_t rmatch[rmax];
+        withreg(reg, 3, rmatch, "[][+-.,<>!#]");
         char c;
         while ((c = getc(infile)) != EOF)
-                if(!regexec(&reg, (char[]){c, 0}, rmax, rmatch, 0))
+                if(!regexec(&reg, (char[]){c, 0}, 3, rmatch, 0))
                         putc(c, outfile);
         return EXIT_SUCCESS;
 }
