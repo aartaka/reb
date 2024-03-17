@@ -166,7 +166,7 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                         break;
                 case ']':
                         if (memory[pointer])
-                                i = *(--brackets);
+                                i = *(--brackets) - 1;
                         break;
                 }
                 i++;
