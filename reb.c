@@ -30,16 +30,21 @@ struct optimization optimizations[] = {
         {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '?'}}
 };
 
-#define withreg(regvar, max, matchvar, ...)    \
+#define withreg(regvar, matchvar, ...)    \
         regex_t regvar;                        \
-        regmatch_t matchvar[max];              \
+        regmatch_t matchvar[1000];              \
         regcomp(&regvar, __VA_ARGS__, 0);
 
+int regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
+{
+        return !regexec(preg, str, 1000, pmatch, 0);
+}
+
 void replace_pattern (char *str, struct optimization opt) {
-        withreg(reg, 1000, rmatch, opt.pattern);
+        withreg(reg, rmatch, opt.pattern);
         char buf[10000];
         strcpy(buf, str);
-        while (!regexec(&reg, str, 1000, rmatch, 0)) {
+        while (regmatch(&reg, str, rmatch)) {
                 size_t buf_idx = 0;
                 for (size_t i = 0; i < strlen(opt.replacement); ++i) {
                         if (opt.replacement[i] < 15) {
@@ -60,17 +65,17 @@ void replace_pattern (char *str, struct optimization opt) {
 
 int minify_file (FILE *infile, FILE *outfile)
 {
-        withreg(reg, 3, rmatch, "[][+-.,<>!#]");
+        withreg(reg, rmatch, "[][+-.,<>!#]");
         char c;
         while ((c = getc(infile)) != EOF)
-                if(!regexec(&reg, (char[]){c, 0}, 3, rmatch, 0))
+                if(regmatch(&reg, (char[]){c, 0}, rmatch))
                         putc(c, outfile);
         return EXIT_SUCCESS;
 }
 
 void optimize_duplicates (char *str) {
-        withreg(reg, 20, rmatches, "\\([+-<>]\\)\\1\\{1,\\}");
-        while (!regexec(&reg, str, 20, rmatches, 0))
+        withreg(reg, rmatches, "\\([+-<>]\\)\\1\\{1,\\}");
+        while (regmatch(&reg, str, rmatches))
                 strcpy(str
                        + rmatches[0].rm_so
                        + sprintf(str + rmatches[0].rm_so, "%d%c",
@@ -98,14 +103,14 @@ struct command {
 };
 
 int parse_file (FILE *codefile, struct command **commands) {
-        withreg(reg, 1000, rmatches,
+        withreg(reg, rmatches,
                 "\\([0-9]\\{0,\\}\\)\\(\\^\\{0,1\\}\\)\\([][+-.,<>!#]\\)");
         int parsed_commands = 0;
         struct command current = {1};
         char str[10000];
         while (fgets(str, 10000, codefile)) {
                 char *buf = str;
-                while (!regexec(&reg, buf, 1000, rmatches, 0)){
+                while (regmatch(&reg, buf, rmatches)){
                         current.number
                                 = (rmatches[1].rm_so == rmatches[1].rm_eo)
                                 ? 1
