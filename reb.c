@@ -107,8 +107,8 @@ int parse_file (FILE *codefile, struct command **commands) {
                 "\\([0-9]\\{0,\\}\\)\\(\\^\\{0,1\\}\\)\\([][+-.,<>!#]\\)");
         int parsed_commands = 0;
         struct command current = {1};
-        char str[10000];
-        while (fgets(str, 10000, codefile)) {
+        char str[1000000];
+        while (fgets(str, 1000000, codefile)) {
                 char *buf = str;
                 while (regmatch(&reg, buf, rmatches)){
                         current.number
