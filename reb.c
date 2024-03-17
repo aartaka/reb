@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
 
 #define matchlen(match) 15+match
 
@@ -17,25 +19,20 @@ struct optimization optimizations[] = {
         {"\\(>\\{2,\\}\\)",                   {matchlen(1), '>'}},
         {"\\(<\\{2,\\}\\)",                   {matchlen(1), '<'}},
         // Copying.
-        {"\\[\\([0-9]\\{0,\\}\\)>+\\1<-\\]",  {1,      '^', '>'}},
-        {"\\[\\([0-9]\\{0,\\}\\)<+\\1>-\\]",  {1,      '^', '<'}},
-        {"\\[-\\([0-9]\\{0,\\}\\)>+\\1<\\]",  {1,      '^', '>'}},
-        {"\\[-\\([0-9]\\{0,\\}\\)<+\\1>\\]",  {1,      '^', '<'}},
-        // Multiplication by three/first approximation.
-        {"\\[\\([0-9]\\{0,\\}\\)>2+\\1<-\\]", {1,           '\''}},
-        {"\\[\\([0-9]\\{0,\\}\\)<2+\\1>-\\]", {1,      '^', '\''}},
-        {"\\[-\\([0-9]\\{0,\\}\\)>2+\\1<\\]", {1,           '\''}},
-        {"\\[-\\([0-9]\\{0,\\}\\)<2+\\1>\\]", {1,      '^', '\''}},
-        // Multiplication by three/second approximation.
-        {"\\[\\([0-9]\\{0,\\}\\)>3+\\1<-\\]", {1,           '"'}},
-        {"\\[\\([0-9]\\{0,\\}\\)<3+\\1>-\\]", {1,      '^', '"'}},
-        {"\\[-\\([0-9]\\{0,\\}\\)>3+\\1<\\]", {1,           '"'}},
-        {"\\[-\\([0-9]\\{0,\\}\\)<3+\\1>\\]", {1,      '^', '"'}},
+        {"\\[\\([0-9]\\{0,\\}\\)>+\\1<-\\]",  {1,           '}'}},
+        {"\\[\\([0-9]\\{0,\\}\\)<+\\1>-\\]",  {1,           '{'}},
+        {"\\[-\\([0-9]\\{0,\\}\\)>+\\1<\\]",  {1,           '}'}},
+        {"\\[-\\([0-9]\\{0,\\}\\)<+\\1>\\]",  {1,           '{'}},
+        // Multiplication by two/first approximation.
+        {"\\[\\([0-9]\\{0,\\}\\)>2+\\1<-\\]", {1,      '^', '}'}},
+        {"\\[\\([0-9]\\{0,\\}\\)<2+\\1>-\\]", {1,      '^', '{'}},
+        {"\\[-\\([0-9]\\{0,\\}\\)>2+\\1<\\]", {1,      '^', '}'}},
+        {"\\[-\\([0-9]\\{0,\\}\\)<2+\\1>\\]", {1,      '^', '{'}},
         // Misc
         {"\\[[0-9]\\{0,\\}-\\]",              {'0',         '='}},
         {"0=\\([0-9]\\{0,\\}\\)+",            {1,           '='}},
-        {"\\[\\([0-9]\\{0,\\}\\)>\\]",        {1,      '^', ']'}},
-        {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '['}}
+        {"\\[\\([0-9]\\{0,\\}\\)>\\]",        {1,           '?'}},
+        {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '?'}}
 };
 
 
@@ -89,30 +86,156 @@ int optimize_file (FILE *infile, FILE *outfile)
         return EXIT_SUCCESS;
 }
 
+struct command {
+        int number;
+        bool special;
+        char command;
+};
+
+int parse_file (FILE *codefile, struct command **commands) {
+        char c;
+        char next;
+        int parsed_commands = 0;
+        struct command current = {1};
+        while ((c = getc(codefile), c && c != EOF)) {
+                switch (c) {
+                case '0': case '1': case '2': case '3': case '4':
+                case '5': case '6': case '7': case '8': case '9':
+                        current.number = (c-48);
+                        while ((next = getc(codefile))) {
+                                if ('^' == next) {
+                                        goto special;
+                                } else if ('+' == next
+                                           || '-' == next
+                                           || '<' == next
+                                           || '>' == next
+                                           || ',' == next
+                                           || '.' == next
+                                           || '[' == next
+                                           || ']' == next) {
+                                        c = next;
+                                        goto command;
+                                } else if (isdigit(next)) {
+                                        current.number *= 10;
+                                        current.number += (next-48);
+                                } else {
+                                        break;
+                                }
+                        }
+                        break;
+                case '^':
+                special:
+                        current.special = true;
+                        break;
+                case '+': case '-':
+                case '<': case '>':
+                case ',': case '.':
+                case '[': case ']':
+                case '{': case '}':
+                case '?': case '=':
+                command:
+                        current.command = c;
+                        commands[0] = malloc(sizeof(struct command));
+                        commands[0]->number = current.number;
+                        commands[0]->special = current.special;
+                        commands[0]->command = current.command;
+                        current.command = current.special = 0;
+                        current.number = 1;
+                        ++commands;
+                        ++parsed_commands;
+                default:
+                        break;
+                }
+        }
+        return EXIT_SUCCESS;
+}
+
+int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
+        unsigned int pointer = 0;
+        char memory [30000];
+        size_t bracket_idx = 0;
+        size_t brackets[200] = {0};
+        for (size_t i = 0; commands[i] != 0;) {
+                printf("Command %c\n", commands[i]->command);
+                struct command *command = commands[i];
+                switch (command->command) {
+                case '+':
+                        memory[pointer] += command->number;
+                        break;
+                case '-':
+                        memory[pointer] -= command->number;
+                        break;
+                case '>':
+                        pointer += command->number;
+                        if (pointer >= 30000)
+                                pointer %= 30000;
+                        break;
+                case '<':
+                        pointer -= command->number;
+                        pointer %= 30000;
+                        break;
+                case ',':
+                        memory[pointer] = getc(infile);
+                        break;
+                case '.':
+                        putc(memory[pointer], outfile);
+                        break;
+                case '[':
+                        if (memory[pointer]) {
+                                brackets[bracket_idx++] = i;
+                        } else {
+                                int j = i;
+                                for (int depth = 1; depth > 0; ++j) {
+                                        if (commands[i]->command == ']')
+                                                depth--;
+                                        else if (commands[i]->command == '[')
+                                                depth++;
+                                        i = j;
+                                }
+                        }
+                        break;
+                case ']':
+                        if (memory[pointer])
+                                i = brackets[--bracket_idx] - 1;
+                        break;
+                }
+                i++;
+        }
+        return EXIT_SUCCESS;
+}
+
 int main (int argc, char **argv)
 {
-        if (argc == 1
-            || strlen(argv[1]) > 1)
-                printf("Please use reb with commands like 'm' or 'o'");
-        FILE *infile;
-        if (argc == 2)
-                infile = stdin;
-        else if (argc > 2 && !strcmp(argv[2], "--"))
-                infile = stdin;
-        else
-                infile = fopen(argv[2], "r");
-        FILE *outfile;
-        if (argc <= 3)
-                outfile = stdout;
-        else if (argc > 3 && !strcmp(argv[3], "--"))
-                outfile = stdout;
-        else
-                outfile = fopen(argv[3], "w");
-        switch (argv[1][0]) {
-        case 'm':
-                return minify_file(infile, outfile);
-        case 'o':
-                return optimize_file(infile, outfile);
-        }
+        /* if (argc == 1 */
+        /*     || strlen(argv[1]) > 1) */
+        /*         printf("Please use reb with commands like 'm' or 'o'"); */
+        /* FILE *infile; */
+        /* if (argc == 2) */
+        /*         infile = stdin; */
+        /* else if (argc > 2 && !strcmp(argv[2], "--")) */
+        /*         infile = stdin; */
+        /* else */
+        /*         infile = fopen(argv[2], "r"); */
+        /* FILE *outfile; */
+        /* if (argc <= 3) */
+        /*         outfile = stdout; */
+        /* else if (argc > 3 && !strcmp(argv[3], "--")) */
+        /*         outfile = stdout; */
+        /* else */
+        /*         outfile = fopen(argv[3], "w"); */
+        /* switch (argv[1][0]) { */
+        /* case 'm': */
+        /*         return minify_file(infile, outfile); */
+        /* case 'o': */
+        /*         return optimize_file(infile, outfile); */
+        /* } */
+        struct command **commands = calloc(100, sizeof(void*));
+        parse_file(fopen("test.bf", "r"), commands);
+        for (int i = 0; commands[i] != 0; ++i)
+                printf("%s command %c on %d\n",
+                       (commands[i]->special ? "Special" : "Regular"),
+                       commands[i]->command,
+                       commands[i]->number);
+        eval_commands(commands, stdin, stdout);
         return EXIT_SUCCESS;
 }
