@@ -30,8 +30,8 @@ struct optimization optimizations[] = {
         {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '?'}}
 };
 
-#define withreg(regvar, matchvar, ...)    \
-        regex_t regvar;                        \
+#define withreg(regvar, matchvar, ...)          \
+        regex_t regvar;                         \
         regmatch_t matchvar[1000];              \
         regcomp(&regvar, __VA_ARGS__, 0);
 
