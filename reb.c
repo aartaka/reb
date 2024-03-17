@@ -13,11 +13,6 @@ struct optimization {
 };
 
 struct optimization optimizations[] = {
-        // Collapsing operations.
-        {"\\(+\\{2,\\}\\)",                   {matchlen(1), '+'}},
-        {"\\(-\\{2,\\}\\)",                   {matchlen(1), '-'}},
-        {"\\(>\\{2,\\}\\)",                   {matchlen(1), '>'}},
-        {"\\(<\\{2,\\}\\)",                   {matchlen(1), '<'}},
         // Copying.
         {"\\[\\([0-9]\\{0,\\}\\)>+\\1<-\\]",  {1,           '}'}},
         {"\\[\\([0-9]\\{0,\\}\\)<+\\1>-\\]",  {1,           '{'}},
@@ -73,10 +68,22 @@ int minify_file (FILE *infile, FILE *outfile)
         return EXIT_SUCCESS;
 }
 
+void optimize_duplicates (char *str) {
+        withreg(reg, 20, rmatches, "\\([+-<>]\\)\\1\\{1,\\}");
+        while (!regexec(&reg, str, 20, rmatches, 0))
+                strcpy(str
+                       + rmatches[0].rm_so
+                       + sprintf(str + rmatches[0].rm_so, "%d%c",
+                                 rmatches[0].rm_eo - rmatches[0].rm_so,
+                                 str[rmatches[0].rm_so]),
+                       str + rmatches[0].rm_eo);
+}
+
 int optimize_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         while (fgets(str, 10000, infile)) {
+                optimize_duplicates(str);
                 for (size_t i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
                         replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
