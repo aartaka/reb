@@ -91,48 +91,23 @@ struct command {
 };
 
 int parse_file (FILE *codefile, struct command **commands) {
-        char c;
-        char next;
+        withreg(reg, 1000, rmatches,
+                "\\([0-9]\\{0,\\}\\)\\(\\^\\{0,1\\}\\)\\([][+-.,<>!#]\\)");
         int parsed_commands = 0;
         struct command current = {1};
-        while ((c = getc(codefile)) != EOF) {
-                switch (c) {
-                case '0': case '1': case '2': case '3': case '4':
-                case '5': case '6': case '7': case '8': case '9':
-                        current.number = (c-48);
-                        while ((next = getc(codefile))) {
-                                if ('^' == next) {
-                                        goto special;
-                                } else if ('+' == next
-                                           || '-' == next
-                                           || '<' == next
-                                           || '>' == next
-                                           || ',' == next
-                                           || '.' == next
-                                           || '[' == next
-                                           || ']' == next) {
-                                        c = next;
-                                        goto command;
-                                } else if (isdigit(next)) {
-                                        current.number *= 10;
-                                        current.number += (next-48);
-                                } else {
-                                        break;
-                                }
-                        }
-                        break;
-                case '^':
-                special:
-                        current.special = true;
-                        break;
-                case '+': case '-':
-                case '<': case '>':
-                case ',': case '.':
-                case '[': case ']':
-                case '{': case '}':
-                case '?': case '=':
-                command:
-                        current.command = c;
+        char str[10000];
+        while (fgets(str, 10000, codefile)) {
+                char *buf = str;
+                while (!regexec(&reg, buf, 1000, rmatches, 0)){
+                        current.number
+                                = (rmatches[1].rm_so == rmatches[1].rm_eo)
+                                ? 1
+                                : atoi(buf + rmatches[1].rm_so);
+                        current.special
+                                = rmatches[2].rm_so != rmatches[2].rm_eo;
+                        current.command
+                                = buf[rmatches[3].rm_so];
+
                         commands[0] = malloc(sizeof(struct command));
                         commands[0]->number = current.number;
                         commands[0]->special = current.special;
@@ -141,8 +116,7 @@ int parse_file (FILE *codefile, struct command **commands) {
                         current.number = 1;
                         ++commands;
                         ++parsed_commands;
-                default:
-                        break;
+                        buf += rmatches[3].rm_eo;
                 }
         }
         return EXIT_SUCCESS;
