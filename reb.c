@@ -94,9 +94,13 @@ int isbf (char c) {
 
 int minify_file (FILE *infile, FILE *outfile)
 {
+        regex_t reg;
+        regcomp(&reg, "[][+-.,<>!#]", 0);
+        size_t rmax = 3;
+        regmatch_t rmatch[rmax];
         char c;
         while ((c = getc(infile)) != EOF)
-                if(isbf(c))
+                if(!regexec(&reg, (char[]){c, 0}, rmax, rmatch, 0))
                         putc(c, outfile);
         return EXIT_SUCCESS;
 }
