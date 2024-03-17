@@ -195,13 +195,14 @@ int main (int argc, char *argv[argc])
                 infile = stdin;
         else
                 infile = fopen(argv[2], "r");
+        struct command **commands;
         switch (argv[1][0]) {
         case 'm':
                 return minify_file(infile, stdout);
         case 'o':
                 return optimize_file(infile, stdout);
         case 'r':
-                struct command **commands = calloc(10000, sizeof(void*));
+                commands = calloc(10000, sizeof(void*));
                 parse_file(infile, commands);
                 /* for (int i = 0; commands[i] != 0; ++i) */
                 /*         printf("%s command %c on %d\n", */
