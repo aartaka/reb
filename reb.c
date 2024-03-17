@@ -152,43 +152,41 @@ int parse_file (FILE *codefile, struct command **commands) {
 
 int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
         unsigned int pointer = 0;
-        char memory [30000];
-        size_t bracket_idx = 0;
-        size_t brackets[200] = {0};
+        char memory_[100000] = {0};
+        char *memory = &memory_[50000];
+        size_t brackets_[200] = {0};
+        size_t *brackets = brackets_;
         for (size_t i = 0; commands[i] != 0;) {
-                printf("Command %c\n", commands[i]->command);
+                /* printf("Command %c\n", commands[i]->command); */
                 struct command *command = commands[i];
                 switch (command->command) {
                 case '+':
-                        memory[pointer] += command->number;
+                        *memory += command->number;
                         break;
                 case '-':
-                        memory[pointer] -= command->number;
+                        *memory -= command->number;
                         break;
                 case '>':
-                        pointer += command->number;
-                        if (pointer >= 30000)
-                                pointer %= 30000;
+                        memory += command->number;
                         break;
                 case '<':
-                        pointer -= command->number;
-                        pointer %= 30000;
+                        memory -= command->number;
                         break;
                 case ',':
-                        memory[pointer] = getc(infile);
+                        *memory = getc(infile);
                         break;
                 case '.':
-                        putc(memory[pointer], outfile);
+                        putc(*memory, outfile);
                         break;
                 case '[':
-                        if (memory[pointer]) {
-                                brackets[bracket_idx++] = i;
+                        if (*memory) {
+                                *(brackets++) = i;
                         } else {
-                                int j = i;
+                                int j = i+1;
                                 for (int depth = 1; depth > 0; ++j) {
-                                        if (commands[i]->command == ']')
+                                        if (commands[j]->command == ']')
                                                 depth--;
-                                        else if (commands[i]->command == '[')
+                                        else if (commands[j]->command == '[')
                                                 depth++;
                                         i = j;
                                 }
@@ -196,7 +194,7 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                         break;
                 case ']':
                         if (memory[pointer])
-                                i = brackets[--bracket_idx] - 1;
+                                i = *(--brackets);
                         break;
                 }
                 i++;
