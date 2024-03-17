@@ -174,37 +174,28 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
         return EXIT_SUCCESS;
 }
 
-int main (int argc, char **argv)
+int main (int argc, char *argv[argc])
 {
-        /* if (argc == 1 */
-        /*     || strlen(argv[1]) > 1) */
-        /*         printf("Please use reb with commands like 'm' or 'o'"); */
-        /* FILE *infile; */
-        /* if (argc == 2) */
-        /*         infile = stdin; */
-        /* else if (argc > 2 && !strcmp(argv[2], "--")) */
-        /*         infile = stdin; */
-        /* else */
-        /*         infile = fopen(argv[2], "r"); */
-        /* FILE *outfile; */
-        /* if (argc <= 3) */
-        /*         outfile = stdout; */
-        /* else if (argc > 3 && !strcmp(argv[3], "--")) */
-        /*         outfile = stdout; */
-        /* else */
-        /*         outfile = fopen(argv[3], "w"); */
-        /* switch (argv[1][0]) { */
-        /* case 'm': */
-        /*         return minify_file(infile, outfile); */
-        /* case 'o': */
-        /*         return optimize_file(infile, outfile); */
-        /* } */
-        struct command **commands = calloc(10000, sizeof(void*));
-        parse_file(fopen("test.bf", "r"), commands);
-        /* for (int i = 0; commands[i] != 0; ++i) */
-        /*         printf("%s command %c on %d\n", */
-        /*                (commands[i]->special ? "Special" : "Regular"), */
-        /*                commands[i]->command, commands[i]->number); */
-        eval_commands(commands, stdin, stdout);
+        FILE *infile;
+        if (argc == 2)
+                infile = stdin;
+        else if (argc > 2 && !strcmp(argv[2], "--"))
+                infile = stdin;
+        else
+                infile = fopen(argv[2], "r");
+        switch (argv[1][0]) {
+        case 'm':
+                return minify_file(infile, stdout);
+        case 'o':
+                return optimize_file(infile, stdout);
+        case 'r':
+                struct command **commands = calloc(10000, sizeof(void*));
+                parse_file(infile, commands);
+                /* for (int i = 0; commands[i] != 0; ++i) */
+                /*         printf("%s command %c on %d\n", */
+                /*                (commands[i]->special ? "Special" : "Regular"), */
+                /*                commands[i]->command, commands[i]->number); */
+                return eval_commands(commands, stdin, stdout);
+        }
         return EXIT_SUCCESS;
 }
