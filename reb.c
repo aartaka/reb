@@ -37,7 +37,7 @@ struct optimization optimizations[] = {
 
 #define withreg(regvar, max, matchvar, ...) \
         regex_t regvar;                        \
-        regmatch_t rmatch[max];             \
+        regmatch_t matchvar[max];             \
         regcomp(&regvar, __VA_ARGS__, 0);
 
 void replace_pattern (char *str, struct optimization opt) {
