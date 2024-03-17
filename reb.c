@@ -129,7 +129,7 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
         size_t brackets_[200] = {0};
         size_t *brackets = brackets_;
         for (size_t i = 0; commands[i] != 0;) {
-                printf("Command %c\n", commands[i]->command);
+                /* printf("Command %c\n", commands[i]->command); */
                 struct command *command = commands[i];
                 switch (command->command) {
                 case '+':
@@ -201,10 +201,10 @@ int main (int argc, char **argv)
         /* } */
         struct command **commands = calloc(10000, sizeof(void*));
         parse_file(fopen("test.bf", "r"), commands);
-        for (int i = 0; commands[i] != 0; ++i)
-                printf("%s command %c on %d\n",
-                       (commands[i]->special ? "Special" : "Regular"),
-                       commands[i]->command, commands[i]->number);
-        // eval_commands(commands, stdin, stdout);
+        /* for (int i = 0; commands[i] != 0; ++i) */
+        /*         printf("%s command %c on %d\n", */
+        /*                (commands[i]->special ? "Special" : "Regular"), */
+        /*                commands[i]->command, commands[i]->number); */
+        eval_commands(commands, stdin, stdout);
         return EXIT_SUCCESS;
 }
