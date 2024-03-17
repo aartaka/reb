@@ -97,7 +97,7 @@ int parse_file (FILE *codefile, struct command **commands) {
         char next;
         int parsed_commands = 0;
         struct command current = {1};
-        while ((c = getc(codefile), c && c != EOF)) {
+        while ((c = getc(codefile)) != EOF) {
                 switch (c) {
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
