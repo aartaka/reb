@@ -35,9 +35,9 @@ struct optimization optimizations[] = {
         {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '?'}}
 };
 
-#define withreg(regvar, max, matchvar, ...) \
+#define withreg(regvar, max, matchvar, ...)    \
         regex_t regvar;                        \
-        regmatch_t matchvar[max];             \
+        regmatch_t matchvar[max];              \
         regcomp(&regvar, __VA_ARGS__, 0);
 
 void replace_pattern (char *str, struct optimization opt) {
