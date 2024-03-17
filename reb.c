@@ -65,33 +65,6 @@ void replace_pattern (char *str, struct optimization opt) {
         }
 }
 
-int regmatch(char *pattern, char *string)
-{
-        regex_t reg;
-        regcomp(&reg, pattern, 0);
-        size_t rmax = 3;
-        regmatch_t rmatch[rmax];
-        return regexec(&reg, string, rmax, rmatch, 0);
-}
-
-int isbf (char c) {
-        switch(c) {
-        case '+':
-        case '-':
-        case '<':
-        case '>':
-        case ',':
-        case '.':
-        case '[':
-        case ']':
-        case '#':
-        case '!':
-                return 1;
-        default:
-                return 0;
-        }
-}
-
 int minify_file (FILE *infile, FILE *outfile)
 {
         regex_t reg;
