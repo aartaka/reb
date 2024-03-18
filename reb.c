@@ -75,13 +75,18 @@ int minify_file (FILE *infile, FILE *outfile)
 
 void optimize_duplicates (char *str) {
         withreg(reg, rmatches, "\\([+-<>]\\)\\1\\{1,\\}");
-        while (regmatch(&reg, str, rmatches))
-                strcpy(str
+        while (regmatch(&reg, str, rmatches)) {
+                char buf [100];
+                int printed = sprintf(buf, "%d%c",
+                                      rmatches[0].rm_eo - rmatches[0].rm_so,
+                                      str[rmatches[0].rm_so]);
+                memcpy(str + rmatches[0].rm_so, buf, printed);
+                memcpy(str
                        + rmatches[0].rm_so
-                       + sprintf(str + rmatches[0].rm_so, "%d%c",
-                                 rmatches[0].rm_eo - rmatches[0].rm_so,
-                                 str[rmatches[0].rm_so]),
-                       str + rmatches[0].rm_eo);
+                       + printed,
+                       str + rmatches[0].rm_eo,
+                       (strlen(str + rmatches[0].rm_eo)));
+        }
 }
 
 int optimize_file (FILE *infile, FILE *outfile)
