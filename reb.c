@@ -126,8 +126,10 @@ int parse_file (FILE *codefile, struct command **commands) {
                                 : atoi(buf + rmatches[1].rm_so);
                         current.special
                                 = rmatches[2].rm_so != rmatches[2].rm_eo;
+                        // TODO: rmatches[3] is numbered arg to the
+                        // special command.
                         current.command
-                                = buf[rmatches[3].rm_so];
+                                = buf[rmatches[4].rm_so];
 
                         commands[0] = malloc(sizeof(struct command));
                         commands[0]->number = current.number;
