@@ -88,10 +88,14 @@ int optimize_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         while (fgets(str, 10000, infile)) {
+                // Remove newline.
+                str[strlen(str)-1] = '\0';
                 optimize_duplicates(str);
                 for (size_t i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
                         replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
+                // Compensate the initial newline stripping.
+                putc('\n', outfile);
         }
         return EXIT_SUCCESS;
 }
