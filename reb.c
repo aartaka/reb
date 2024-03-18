@@ -65,7 +65,7 @@ void replace_pattern (char *str, struct optimization opt) {
 
 int minify_file (FILE *infile, FILE *outfile)
 {
-        withreg(reg, rmatch, "[][+-.,<>!#]");
+        withreg(reg, rmatch, "[][+.,<>!#]-");
         char c;
         while ((c = getc(infile)) != EOF)
                 if(regmatch(&reg, (char[]){c, 0}, rmatch))
@@ -74,7 +74,7 @@ int minify_file (FILE *infile, FILE *outfile)
 }
 
 void optimize_duplicates (char *str) {
-        withreg(reg, rmatches, "\\([+-<>]\\)\\1\\{1,\\}");
+        withreg(reg, rmatches, "\\([-+<>]\\)\\1\\{1,\\}");
         while (regmatch(&reg, str, rmatches)) {
                 char buf [100];
                 int printed = sprintf(buf, "%d%c",
@@ -113,7 +113,7 @@ struct command {
 
 int parse_file (FILE *codefile, struct command **commands) {
         withreg(reg, rmatches,
-                "\\([0-9]\\{0,\\}\\)\\(\\^\\{0,1\\}\\)\\([][+-.,<>!#]\\)");
+                "\\([0-9]\\{0,\\}\\)\\(\\^\\([0-9]\\{0,\\}\\)\\)\\{0,1\\}\\([][+.,<>!#-]\\)");
         int parsed_commands = 0;
         struct command current = {1};
         char str[1000000];
