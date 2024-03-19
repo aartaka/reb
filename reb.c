@@ -40,26 +40,24 @@ int regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
         return !regexec(preg, str, 1000, pmatch, 0);
 }
 
-void replace_pattern (char *str, struct optimization opt) {
+void replace_pattern (char *str, struct optimization opt)
+{
         withreg(reg, rmatch, opt.pattern);
-        char buf[10000];
-        strcpy(buf, str);
+        char copy[10000];
+        strcpy(copy, str);
         while (regmatch(&reg, str, rmatch)) {
-                size_t buf_idx = 0;
-                for (size_t i = 0; i < strlen(opt.replacement); ++i) {
-                        if (opt.replacement[i] < 15) {
+                int offset = rmatch[0].rm_so;
+                for (int i = 0; opt.replacement[i] != 0; ++i) {
+                        if (opt.replacement[i] < ' ') {
                                 regmatch_t match = rmatch[(size_t)opt.replacement[i]];
-                                strcpy(buf + buf_idx, str + match.rm_so);
-                                buf_idx += match.rm_eo - match.rm_so;
-                        } else if (15 < opt.replacement[i] && opt.replacement[i] < ' ') {
-                                regmatch_t match = rmatch[opt.replacement[i] - 15];
-                                buf_idx += sprintf(buf + buf_idx, "%d", match.rm_eo - match.rm_so);
+                                memmove(str + offset, &copy[match.rm_so], match.rm_eo - match.rm_so);
+                                offset += match.rm_eo - match.rm_so;
                         } else {
-                                buf[buf_idx++] = opt.replacement[i];
+                                str[offset++] = opt.replacement[i];
                         }
                 }
-                memcpy(str + rmatch[0].rm_so, buf, buf_idx);
-                strcpy(str + rmatch[0].rm_so + buf_idx, str + rmatch[0].rm_eo);
+                strcpy(str + offset, copy + rmatch[0].rm_eo);
+                strcpy(copy, str);
         }
 }
 
