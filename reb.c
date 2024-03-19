@@ -181,8 +181,8 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                                                 depth--;
                                         else if (commands[j]->command == '[')
                                                 depth++;
-                                        i = j;
                                 }
+                                i = j;
                         }
                         break;
                 case ']':
