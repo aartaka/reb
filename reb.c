@@ -152,6 +152,7 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
         for (size_t i = 0; commands[i] != 0;) {
                 /* printf("%c", commands[i]->command); */
                 struct command *command = commands[i];
+                char c;
                 switch (command->command) {
                 case '+':
                         *memory += command->number;
@@ -166,7 +167,8 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                         memory -= command->number;
                         break;
                 case ',':
-                        *memory = getc(infile);
+                        if ((c = getc(infile)) != EOF)
+                                *memory = c;
                         break;
                 case '.':
                         putc(*memory, outfile);
