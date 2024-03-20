@@ -74,11 +74,10 @@ void optimize_duplicates (char *str) {
                                       rmatches[0].rm_eo - rmatches[0].rm_so,
                                       str[rmatches[0].rm_so]);
                 memcpy(str + rmatches[0].rm_so, buf, printed);
-                memcpy(str
+                strcpy(str
                        + rmatches[0].rm_so
                        + printed,
-                       str + rmatches[0].rm_eo,
-                       (strlen(str + rmatches[0].rm_eo)));
+                       str + rmatches[0].rm_eo);
         }
 }
 
