@@ -102,7 +102,7 @@ struct command {
         char command;
 };
 
-int parse_file (FILE *codefile, struct command **commands) {
+int parse_file (FILE *codefile, struct command *commands) {
         withreg(reg, rmatches,
                 "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([][+.,<>!#-]\\)");
         int parsed_commands = 0;
@@ -122,10 +122,9 @@ int parse_file (FILE *codefile, struct command **commands) {
                         current.command
                                 = buf[rmatches[3].rm_so];
 
-                        commands[0] = malloc(sizeof(struct command));
-                        commands[0]->number = current.number;
-                        commands[0]->special = current.special;
-                        commands[0]->command = current.command;
+                        commands[0].number = current.number;
+                        commands[0].special = current.special;
+                        commands[0].command = current.command;
                         current.command = current.special = 0;
                         current.number = 1;
                         ++commands;
@@ -136,26 +135,26 @@ int parse_file (FILE *codefile, struct command **commands) {
         return EXIT_SUCCESS;
 }
 
-int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
+int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
         char memory_[100000] = {0};
         char *memory = &memory_[50000];
         int depth = 0;
-        for (size_t i = 0; commands[i] != 0; ++i) {
+        for (size_t i = 0; commands[i].command != 0; ++i) {
                 /* printf("%c", commands[i]->command); */
-                struct command *command = commands[i];
+                struct command command = commands[i];
                 char c;
-                switch (command->command) {
+                switch (command.command) {
                 case '+':
-                        *memory += command->number;
+                        *memory += command.number;
                         break;
                 case '-':
-                        *memory -= command->number;
+                        *memory -= command.number;
                         break;
                 case '>':
-                        memory += command->number;
+                        memory += command.number;
                         break;
                 case '<':
-                        memory -= command->number;
+                        memory -= command.number;
                         break;
                 case ',':
                         if ((c = getc(infile)) != EOF)
@@ -166,12 +165,12 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                         break;
                 case '[':
                         if (!*memory)
-                                while((depth += (commands[i]->command=='[') - (commands[i]->command==']')))
+                                while((depth += (commands[i].command=='[') - (commands[i].command==']')))
                                         i++;
                         break;
                 case ']':
                         if (*memory)
-                                while((depth += (commands[i]->command==']') - (commands[i]->command=='[')))
+                                while((depth += (commands[i].command==']') - (commands[i].command=='[')))
                                         i--;
                         break;
                 }
@@ -188,19 +187,18 @@ int main (int argc, char *argv[argc])
                 infile = stdin;
         else
                 infile = fopen(argv[2], "r");
-        struct command **commands;
+        struct command commands[100000] = {{0}};
         switch (argv[1][0]) {
         case 'm':
                 return minify_file(infile, stdout);
         case 'o':
                 return optimize_file(infile, stdout);
         case 'r':
-                commands = calloc(10000, sizeof(void*));
                 parse_file(infile, commands);
-                /* for (int i = 0; commands[i] != 0; ++i) */
+                /* for (int i = 0; commands[i].command != 0; ++i) */
                 /*         printf("%s command %c on %d\n", */
-                /*                (commands[i]->special ? "Special" : "Regular"), */
-                /*                commands[i]->command, commands[i]->number); */
+                /*                (commands[i].special ? "Special" : "Regular"), */
+                /*                commands[i].command, commands[i].number); */
                 return eval_commands(commands, stdin, stdout);
         }
         return EXIT_SUCCESS;
