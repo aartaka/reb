@@ -144,7 +144,6 @@ int parse_file (FILE *codefile, struct command **commands) {
 }
 
 int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
-        unsigned int pointer = 0;
         char memory_[100000] = {0};
         char *memory = &memory_[50000];
         size_t brackets_[200] = {0};
@@ -188,7 +187,7 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                         }
                         break;
                 case ']':
-                        if (memory[pointer])
+                        if (*memory)
                                 i = *(--brackets) - 1;
                         break;
                 }
