@@ -148,7 +148,7 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
         char *memory = &memory_[50000];
         size_t brackets_[200] = {0};
         size_t *brackets = brackets_;
-        for (size_t i = 0; commands[i] != 0;) {
+        for (size_t i = 0; commands[i] != 0; ++i) {
                 /* printf("%c", commands[i]->command); */
                 struct command *command = commands[i];
                 char c;
@@ -191,7 +191,6 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                                 i = *(--brackets) - 1;
                         break;
                 }
-                i++;
         }
         return EXIT_SUCCESS;
 }
