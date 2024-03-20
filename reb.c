@@ -73,7 +73,7 @@ void replace_pattern (char *str, struct optimization opt)
 
 int minify_file (FILE *infile, FILE *outfile)
 {
-        withreg(reg, rmatch, "[][+.,<>!#]-");
+        withreg(reg, rmatch, "[][+.,<>!#-]");
         char c;
         while ((c = getc(infile)) != EOF)
                 if(regmatch(&reg, (char[]){c, 0}, rmatch))
