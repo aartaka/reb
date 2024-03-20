@@ -164,11 +164,13 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
                         putc(*memory, outfile);
                         break;
                 case '[':
+                        // Stolen from microbf, will refactor later.
                         if (!*memory)
                                 while((depth += (commands[i].command=='[') - (commands[i].command==']')))
                                         i++;
                         break;
                 case ']':
+                        // Stolen from microbf, will refactor later.
                         if (*memory)
                                 while((depth += (commands[i].command==']') - (commands[i].command=='[')))
                                         i--;
