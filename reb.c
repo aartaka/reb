@@ -22,7 +22,10 @@ struct optimization optimizations[] = {
         {"\\[[0-9]\\{0,\\}-\\]",              {'0',         '='}},
         {"0=\\([0-9]\\{0,\\}\\)+",            {1,           '='}},
         {"\\[\\([0-9]\\{0,\\}\\)>\\]",        {1,           '?'}},
-        {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '?'}}
+        {"\\[\\([0-9]\\{0,\\}\\)<\\]",        {1,      '^', '?'}},
+        // Questionable: optimize empty loops to nothing. Otherwise
+        // these are endless loops, which make no sense, right?
+        {"[]",                                {0}}
 };
 
 #define withreg(regvar, matchvar, ...)          \
