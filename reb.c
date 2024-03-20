@@ -146,8 +146,7 @@ int parse_file (FILE *codefile, struct command **commands) {
 int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
         char memory_[100000] = {0};
         char *memory = &memory_[50000];
-        size_t brackets_[200] = {0};
-        size_t *brackets = brackets_;
+        int depth = 0;
         for (size_t i = 0; commands[i] != 0; ++i) {
                 /* printf("%c", commands[i]->command); */
                 struct command *command = commands[i];
@@ -173,22 +172,14 @@ int eval_commands (struct command **commands, FILE *infile, FILE *outfile) {
                         putc(*memory, outfile);
                         break;
                 case '[':
-                        if (*memory) {
-                                *(brackets++) = i;
-                        } else {
-                                int j = i+1;
-                                for (int depth = 1; depth > 0; ++j) {
-                                        if (commands[j]->command == ']')
-                                                depth--;
-                                        else if (commands[j]->command == '[')
-                                                depth++;
-                                }
-                                i = j;
-                        }
+                        if (!*memory)
+                                while((depth += (commands[i]->command=='[') - (commands[i]->command==']')))
+                                        i++;
                         break;
                 case ']':
                         if (*memory)
-                                i = *(--brackets) - 1;
+                                while((depth += (commands[i]->command==']') - (commands[i]->command=='[')))
+                                        i--;
                         break;
                 }
         }
