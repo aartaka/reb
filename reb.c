@@ -106,7 +106,7 @@ struct command {
 
 int parse_file (FILE *codefile, struct command *commands) {
         withreg(reg, rmatches,
-                "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([][+.,<>!#?{}-]\\)");
+                "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([][+.,<>!#=?{}-]\\)");
         int parsed_commands = 0;
         struct command current = {1};
         char str[1000000];
