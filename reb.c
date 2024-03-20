@@ -187,6 +187,12 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
                         *(memory-command.number) = *memory;
                         *memory = 0;
                         break;
+                case '?':
+                        if (command.special)
+                                for (; *memory; memory--);
+                        else
+                                memory = memchr(memory, '\0', strlen(memory));
+                        break;
                 }
         }
         return EXIT_SUCCESS;
