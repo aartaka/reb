@@ -177,6 +177,17 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
                                 while((depth += (commands[i].command==']') - (commands[i].command=='[')))
                                         i--;
                         break;
+                case '=':
+                        *memory = command.number;
+                        break;
+                case '}':
+                        *(memory+command.number) = *memory;
+                        *memory = 0;
+                        break;
+                case '{':
+                        *(memory-command.number) = *memory;
+                        *memory = 0;
+                        break;
                 }
         }
         return EXIT_SUCCESS;
