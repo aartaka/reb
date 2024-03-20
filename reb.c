@@ -141,7 +141,7 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
         char *memory = &memory_[50000];
         int depth = 0;
         for (size_t i = 0; commands[i].command != 0; ++i) {
-                /* printf("%c", commands[i]->command); */
+                /* printf("%c", commands[i].command); */
                 struct command command = commands[i];
                 char c;
                 switch (command.command) {
