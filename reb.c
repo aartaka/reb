@@ -94,8 +94,6 @@ int optimize_file (FILE *infile, FILE *outfile)
                 for (size_t i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
                         replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
-                // Compensate the initial newline stripping.
-                putc('\n', outfile);
         }
         return EXIT_SUCCESS;
 }
