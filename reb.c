@@ -107,7 +107,7 @@ struct command {
 
 int parse_file (FILE *codefile, struct command *commands) {
         withreg(reg, rmatches,
-                "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([][+.,<>!#=?{}-]\\)");
+                "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=?{}-]\\)");
         int parsed_commands = 0;
         struct command current = {1};
         char str[1000000];
@@ -123,7 +123,7 @@ int parse_file (FILE *codefile, struct command *commands) {
                         // TODO: rmatches[3] is numbered arg to the
                         // special command.
                         current.command
-                                = buf[rmatches[3].rm_so];
+                                = buf[rmatches[4].rm_so];
 
                         commands[0].number = current.number;
                         commands[0].special = current.special;
@@ -132,7 +132,7 @@ int parse_file (FILE *codefile, struct command *commands) {
                         current.number = 1;
                         ++commands;
                         ++parsed_commands;
-                        buf += rmatches[3].rm_eo;
+                        buf += rmatches[4].rm_eo;
                 }
         }
         return EXIT_SUCCESS;
