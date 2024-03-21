@@ -195,6 +195,13 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
                         else
                                 memory = memchr(memory, '\0', strlen(memory));
                         break;
+                case '#':
+                        for (int i = 0, max = (command.number == 1 ? 10 : command.number); i < max; ++i)
+                                printf("%c%d/%c%c",
+                                       ((memory + i - max / 2) == memory ? '[' : ' '),
+                                       *(memory + i - max / 2),
+                                       *(memory + i - max / 2),
+                                       ((memory + i - max / 2) == memory ? ']' : ' '));
                 }
         }
         return EXIT_SUCCESS;
