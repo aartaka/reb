@@ -13,6 +13,8 @@ struct optimization {
 };
 
 struct optimization optimizations[] = {
+        // Minification
+        {"[^][+.,<>-]",                       {0               }},
         // Copying.
         {"\\[\\([0-9]\\{0,\\}\\)>+\\1<-\\]",  {1,           '}'}},
         {"\\[\\([0-9]\\{0,\\}\\)<+\\1>-\\]",  {1,           '{'}},
@@ -61,12 +63,14 @@ void replace_pattern (char *str, struct optimization opt)
 
 int minify_file (FILE *infile, FILE *outfile)
 {
-        withreg(reg, rmatch, "[][+.,<>!#-]");
-        char c;
-        while ((c = getc(infile)) != EOF)
-                if(regmatch(&reg, (char[]){c, 0}, rmatch))
-                        putc(c, outfile);
-        return EXIT_SUCCESS;
+        char str[10000];
+        while (fgets(str, 10000, infile)) {
+                // Remove newline.
+                str[strlen(str)-1] = '\0';
+                // Minification pattern is the first optimization.
+                replace_pattern(str, optimizations[0]);
+                fputs(str, outfile);
+        }
 }
 
 void optimize_duplicates (char *str) {
