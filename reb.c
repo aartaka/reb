@@ -134,7 +134,7 @@ int minify_file (FILE *infile, FILE *outfile)
         char str[10000];
         while (fgets(str, 10000, infile)) {
                 // Remove newline.
-                str[strlen(str)-1] = '\0';
+                str[strlen(str)] = '\0';
                 // Minification pattern is the first optimization.
                 replace_pattern(str, optimizations[0]);
                 fputs(str, outfile);
