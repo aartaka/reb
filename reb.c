@@ -112,7 +112,6 @@ struct command {
 int parse_file (FILE *codefile, struct command *commands) {
         withreg(reg, rmatches,
                 "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=?{}-]\\)");
-        int parsed_commands = 0;
         struct command current = {1};
         char str[1000000];
         while (fgets(str, 1000000, codefile)) {
@@ -129,13 +128,12 @@ int parse_file (FILE *codefile, struct command *commands) {
                         current.command
                                 = buf[rmatches[4].rm_so];
 
-                        commands[0].number = current.number;
-                        commands[0].special = current.special;
-                        commands[0].command = current.command;
+                        commands->number = current.number;
+                        commands->special = current.special;
+                        commands->command = current.command;
                         current.command = current.special = 0;
                         current.number = 1;
                         ++commands;
-                        ++parsed_commands;
                         buf += rmatches[4].rm_eo;
                 }
         }
