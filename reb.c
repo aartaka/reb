@@ -15,6 +15,16 @@ struct optimization {
 struct optimization optimizations[] = {
         // Minification
         {"[^][+.,<>-]",                       {0               }},
+        // Duplicates.
+        {"^\\([-+<>]\\)\\1",                  {'2',    1}},
+        {"\\([^0-9]\\)\\([-+<>]\\)\\2",       {1, '2',    2}},
+        {"2\\([-+<>]\\)2\\1",                 {'4',         1}},
+        {"4\\([-+<>]\\)4\\1",                 {'8',         1}},
+        {"8\\([-+<>]\\)8\\1",                 {'1', '6',    1}},
+        {"16\\([-+<>]\\)16\\1",               {'3', '2',    1}},
+        {"32\\([-+<>]\\)32\\1",               {'6', '4',    1}},
+        {"64\\([-+<>]\\)64\\1",               {'1', '2', '8', 1}},
+        {"128\\([-+<>]\\)128\\1",             {}},
         // Copying.
         {"\\[\\([0-9]\\{0,\\}\\)>+\\1<-\\]",  {1,           '}'}},
         {"\\[\\([0-9]\\{0,\\}\\)<+\\1>-\\]",  {1,           '{'}},
@@ -73,29 +83,12 @@ int minify_file (FILE *infile, FILE *outfile)
         }
 }
 
-void optimize_duplicates (char *str) {
-        withreg(reg, rmatches, "\\([-+<>]\\)\\1\\{1,\\}");
-        while (regmatch(&reg, str, rmatches)) {
-                char buf [100];
-                int printed = sprintf(buf, "%d%c",
-                                      rmatches[0].rm_eo - rmatches[0].rm_so,
-                                      str[rmatches[0].rm_so]);
-                memcpy(str + rmatches[0].rm_so, buf, printed);
-                memmove(str
-                        + rmatches[0].rm_so
-                        + printed,
-                        str + rmatches[0].rm_eo,
-                        strlen(str + rmatches[0].rm_eo) + 1);
-        }
-}
-
 int optimize_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         while (fgets(str, 10000, infile)) {
                 // Remove newline.
                 str[strlen(str)] = '\0';
-                optimize_duplicates(str);
                 for (size_t i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
                         replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
