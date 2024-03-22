@@ -89,6 +89,7 @@ int minify_file (FILE *infile, FILE *outfile)
                 replace_pattern(str, optimizations[0]);
                 fputs(str, outfile);
         }
+        return EXIT_SUCCESS;
 }
 
 int optimize_file (FILE *infile, FILE *outfile)
