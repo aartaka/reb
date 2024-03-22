@@ -5,8 +5,6 @@
 #include <stdbool.h>
 #include <ctype.h>
 
-#define matchlen(match) 15+match
-
 struct optimization {
         char *pattern;
         char replacement[20];
