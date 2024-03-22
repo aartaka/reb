@@ -5,6 +5,14 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+#ifndef MEMSIZE
+#define MEMSIZE 100000
+#endif
+
+#ifndef CELLTYPE
+#define CELLTYPE char
+#endif
+
 struct optimization {
         char *pattern;
         char replacement[20];
@@ -191,8 +199,8 @@ int parse_file (FILE *codefile, struct command *commands) {
 }
 
 int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
-        char memory_[100000] = {0};
-        char *memory = &memory_[50000];
+        CELLTYPE memory_[MEMSIZE] = {0};
+        CELLTYPE *memory = &memory_[MEMSIZE/2];
         int depth = 0;
         for (size_t i = 0; commands[i].command != 0; ++i) {
                 /* printf("%c", commands[i].command); */
