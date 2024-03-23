@@ -20,7 +20,7 @@ struct optimization {
 
 struct optimization optimizations[] = {
         // Minification
-        {"[^][+.,<>-]",                       {               0}},
+        {"[^][+.,<>!#-]",                     {               0}},
         // Duplicates.
         {"^\\([-+<>]\\)\\1",                  {'2',           1}},
         {"\\([^0-9]\\)\\([-+<>]\\)\\2",       {1, '2',        2}},
