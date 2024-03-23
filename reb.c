@@ -198,9 +198,10 @@ int parse_file (FILE *codefile, struct command *commands) {
         return EXIT_SUCCESS;
 }
 
+CELLTYPE memory_[MEMSIZE] = {0};
+CELLTYPE *memory = &memory_[MEMSIZE/2];
+
 int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
-        CELLTYPE memory_[MEMSIZE] = {0};
-        CELLTYPE *memory = &memory_[MEMSIZE/2];
         int depth = 0;
         for (size_t i = 0; commands[i].command != 0; ++i) {
                 /* printf("%c", commands[i].command); */
