@@ -249,11 +249,12 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
                         break;
                 case '#':
                         for (int i = 0, max = (command.number == 1 ? 10 : command.number); i < max; ++i)
-                                printf("%c%d/%c%c",
-                                       ((memory + i - max / 2) == memory ? '[' : ' '),
-                                       *(memory + i - max / 2),
-                                       *(memory + i - max / 2),
-                                       ((memory + i - max / 2) == memory ? ']' : ' '));
+                                fprintf(outfile,
+                                        "%c%d/%c%c",
+                                        ((memory + i - max / 2) == memory ? '[' : ' '),
+                                        *(memory + i - max / 2),
+                                        *(memory + i - max / 2),
+                                        ((memory + i - max / 2) == memory ? ']' : ' '));
                         fputs("\n", outfile);
                         break;
                 }
