@@ -114,7 +114,7 @@ int regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
         return !regexec(preg, str, 1000, pmatch, 0);
 }
 
-void replace_pattern (char *str, struct optimization opt)
+char *replace_pattern (char *str, struct optimization opt)
 {
         withreg(reg, rmatch, opt.pattern);
         char copy[10000];
@@ -133,18 +133,16 @@ void replace_pattern (char *str, struct optimization opt)
                 strcpy(str + offset, copy + rmatch[0].rm_eo);
                 strcpy(copy, str);
         }
+        return str;
 }
 
 int minify_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
-        while (fgets(str, 10000, infile)) {
-                // Remove newline.
-                str[strlen(str)] = '\0';
-                // Minification pattern is the first optimization.
-                replace_pattern(str, optimizations[0]);
-                fputs(str, outfile);
-        }
+        // Minification pattern is the first optimization.
+        struct optimization minification = optimizations[0];
+        while (fgets(str, 10000, infile))
+                fputs(replace_pattern(str, minification), outfile);
         return EXIT_SUCCESS;
 }
 
@@ -152,8 +150,6 @@ int optimize_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         while (fgets(str, 10000, infile)) {
-                // Remove newline.
-                str[strlen(str)] = '\0';
                 for (size_t i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
                         replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
