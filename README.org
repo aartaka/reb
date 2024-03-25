@@ -52,3 +52,12 @@ You can do that:
 
 (although it will be slow.
 So you better split the stages and run the minified/optimized file when it's ready.)
+
+* History
+
+Reb is a sequel to [[https://github.com/aartaka/sade][Sade]], my Brainfuck-to-Lisp optimizing compiler.
+While Sade is quite fast and nice to use...
+The way optimizations are implemented is quite hard to maintain.
+So I figured that this optimization of Brainfuck command patterns is a good use for regex.
+Here we are: Reb is a tool utilizing regex to minify, compile, and parse Brainfuck code.
+Success. Alpplause. Bring down the curtain.
