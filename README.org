@@ -1,0 +1,54 @@
+#+TITLE:Reb—regex-based Brainfuck toolkit
+
+Reb is a CLI tool for working with Brainfuck. Right now, it supports:
+- Code minification.
+- Pattern optimization.
+- And evaluation of both Brainfuck and optimized code format.
+
+The catch is: it's all regex.
+The goal of the project is to use regex as much as possible.
+Though the evaluation is not based on regular expressions.
+Minification and optimization are, at least.
+
+* Getting started
+
+You only need to clone the repo:
+
+#+begin_src sh
+git clone https://github.com/aartaka/reb
+#+end_src
+
+and run
+#+begin_src sh
+make all
+#+end_src
+
+in the checked-out directory.
+After that, you'll have an executable called =reb= around.
+Use it:
+
+* Usage
+
+There are three main commands in Reb:
+- m :: minification.
+- o :: optimization.
+- r :: evaluation (from "run").
+
+Either of these is invoked as a prefix following the executable name.
+I.e., minifying =file.bf= into =file.min.bf= is:
+#+begin_src sh
+./reb m file.bf > file.min.bf
+#+end_src
+
+You can see the (ab)use of shell redirection here.
+Reb is intended to fit the UNIX-y model of tools' interation.
+Want to evaluate output of some command? Pipe it to =./reb r --= (where =--= stands for stdin).
+Want to save the optimized code to a file? Use output redirection.
+Want to have a pipeline of minification+optimization+evaluation?
+You can do that:
+#+begin_src sh
+  ./reb m file.bf | ./reb o -- | ./reb r --
+#+end_src
+
+(although it will be slow.
+So you better split the stages and run the minified/optimized file when it's ready.)
