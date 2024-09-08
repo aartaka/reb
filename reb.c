@@ -31,7 +31,7 @@ struct optimization optimizations[] = {
         // Copying.
         {"\\[\\([0-9]*\\)>+\\1<-\\]",         {1,             '}'}},
         {"\\[\\([0-9]*\\)<+\\1>-\\]",         {1,             '{'}},
-        /* // Misc */
+        // Misc
         {"\\[[0-9]*[+-]\\]",                  {'0',           '='}},
         {"0=\\([0-9]*\\)+",                   {1,             '='}},
         {"\\[\\([0-9]*\\)>\\]",               {1,             ')'}},
@@ -39,8 +39,14 @@ struct optimization optimizations[] = {
         // Questionable: optimize empty loops to nothing. Otherwise
         // these are endless loops, which make no sense, right?
         {"\\[\\]",                            {                 0}},
+        // Comment loops
         {"^\\[[^][]*\\]",                     {                 0}},
+        {"^\\[.*\\]",                         {                 0}},
         {"\\]\\[[^][]*\\]",                   {']'               }},
+        // Other no-ops
+        {"<>",                                {                  }},
+        {"><",                                {                  }},
+        {"\\([0-9]*\\)[=+-],",                {','               }},
 };
 
 #define withreg(regvar, matchvar, ...)          \
