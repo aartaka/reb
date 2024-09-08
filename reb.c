@@ -106,7 +106,8 @@ struct command {
         char command;
 };
 
-int parse_file (FILE *codefile, struct command *commands) {
+int parse_file (FILE *codefile, struct command *commands)
+{
         withreg(reg, rmatches,
                 "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=(){}-]\\)");
         struct command current = {1};
@@ -140,7 +141,8 @@ int parse_file (FILE *codefile, struct command *commands) {
 CELLTYPE memory_[MEMSIZE] = {0};
 CELLTYPE *memory = &memory_[MEMSIZE/2];
 
-int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
+int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
+{
         int depth = 0;
         for (size_t i = 0; commands[i].command; ++i) {
                 /* printf("%c", commands[i].command); */
