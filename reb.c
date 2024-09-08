@@ -36,8 +36,8 @@ struct optimization optimizations[] = {
         /* // Misc */
         {"\\[[0-9]*-\\]",                     {'0',           '='}},
         {"0=\\([0-9]*\\)+",                   {1,             '='}},
-        {"\\[>\\]",                           {               '?'}},
-        {"\\[<\\]",                           {          '^', '?'}},
+        {"\\[\\([0-9]*\\)>\\]",               {1,             ')'}},
+        {"\\[\\([0-9]*\\)<\\]",               {1,             '('}},
         // Questionable: optimize empty loops to nothing. Otherwise
         // these are endless loops, which make no sense, right?
         {"\\[\\]",                            {                 0}},
@@ -189,11 +189,11 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
                         *(memory-command.number) = *memory;
                         *memory = 0;
                         break;
-                case '?':
-                        if (command.special)
-                                for (; *memory; memory--);
-                        else
-                                memory = memchr(memory, '\0', MEMSIZE);
+                case ')':
+                        memory = memchr(memory, '\0', MEMSIZE);
+                        break;
+                case '(':
+                        for (; *memory; memory--);
                         break;
                 case '#':
                         for (int i = 0, max = (command.number == 1 ? 10 : command.number); i < max; ++i)
