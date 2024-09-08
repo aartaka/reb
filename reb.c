@@ -210,6 +210,7 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                                         ((memory + i - max / 2) == memory ? ']' : ' '));
                         fputs("\n", outfile);
                         break;
+                        // TODO: ! handling (a complicated one!)
                 }
         }
         return EXIT_SUCCESS;
