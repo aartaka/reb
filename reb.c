@@ -108,7 +108,7 @@ struct command {
 
 int parse_file (FILE *codefile, struct command *commands) {
         withreg(reg, rmatches,
-                "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=?{}-]\\)");
+                "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=(){}-]\\)");
         struct command current = {1};
         char str[1000000];
         while (fgets(str, 1000000, codefile)) {
@@ -190,10 +190,10 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
                         *memory = 0;
                         break;
                 case ')':
-                        memory = memchr(memory, '\0', MEMSIZE);
+                        for (; *memory; memory += command.number);
                         break;
                 case '(':
-                        for (; *memory; memory--);
+                        for (; *memory; memory -= command.number);
                         break;
                 case '#':
                         for (int i = 0, max = (command.number == 1 ? 10 : command.number); i < max; ++i)
