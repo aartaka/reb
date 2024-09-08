@@ -91,8 +91,13 @@ int optimize_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         while (fgets(str, 10000, infile)) {
-                for (size_t i = 0; i < sizeof(optimizations) / sizeof(struct optimization); ++i)
-                        replace_pattern(str, optimizations[i]);
+                // Repeat multiple times to make sure everything is optimized.
+                for (int iter = 0; iter < 5; ++iter)
+                        // Ignoring minimization rule on later passes.
+                        for (size_t i = (iter ? 1 : 0);
+                             i < sizeof(optimizations) / sizeof(struct optimization);
+                             ++i)
+                                replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
         }
         return EXIT_SUCCESS;
