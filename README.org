@@ -53,6 +53,14 @@ You can do that:
 (although it will be slow.
 So you better split the stages and run the minified/optimized file when it's ready.)
 
+* Optimized Code Specification (WIP)
+
+- [, ], ., , :: Like in Brainfuck
+- +, -, <, > :: Like in Brainfuck, except they can have a numeric argument specifying how many times to repeat them.
+- = :: Set the contents of the cell to numeric argument.
+- { and } :: Copy to the left and copy to the right respectively. Numeric argument defines how many cells to the left/right to copy to.
+- ( and ) :: Scan the memory (to the left and right respectively) for zero cell and stop there. Numeric argument defines how many cells to skip though.
+
 * History
 
 Reb is a sequel to [[https://github.com/aartaka/sade][Sade]], my Brainfuck-to-Lisp optimizing compiler.
