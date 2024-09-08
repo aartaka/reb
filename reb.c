@@ -169,10 +169,7 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                                 *memory = c;
                         break;
                 case '.':
-                        // Faulty command.number == 1, but it'll do.
-                        putc((command.number == 1
-                              ? *memory
-                              : command.number), outfile);
+                        putc(*memory, outfile);
                         break;
                 case '[':
                         // Stolen from microbf, will refactor later.
