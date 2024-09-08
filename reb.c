@@ -116,7 +116,7 @@ char *replace_pattern (char *str, struct optimization opt)
         strcpy(copy, str);
         while (regmatch(&reg, str, rmatch)) {
                 int offset = rmatch[0].rm_so;
-                for (int i = 0; opt.replacement[i] != 0; ++i) {
+                for (int i = 0; opt.replacement[i]; ++i) {
                         if (opt.replacement[i] < ' ') {
                                 regmatch_t match = rmatch[(size_t)opt.replacement[i]];
                                 memmove(str + offset, &copy[match.rm_so], match.rm_eo - match.rm_so);
@@ -194,7 +194,7 @@ CELLTYPE *memory = &memory_[MEMSIZE/2];
 
 int eval_commands (struct command *commands, FILE *infile, FILE *outfile) {
         int depth = 0;
-        for (size_t i = 0; commands[i].command != 0; ++i) {
+        for (size_t i = 0; commands[i].command; ++i) {
                 /* printf("%c", commands[i].command); */
                 struct command command = commands[i];
                 char c;
@@ -279,7 +279,7 @@ int main (int argc, char *argv[argc])
                 return optimize_file(infile, stdout);
         case 'r':
                 parse_file(infile, commands);
-                /* for (int i = 0; commands[i].command != 0; ++i) */
+                /* for (int i = 0; commands[i].command; ++i) */
                 /*         printf("%s command %c on %d\n", */
                 /*                (commands[i].special ? "Special" : "Regular"), */
                 /*                commands[i].command, commands[i].number); */
