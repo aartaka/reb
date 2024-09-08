@@ -36,6 +36,7 @@ struct optimization optimizations[] = {
         {"0=\\([0-9]*\\)+",                   {1,             '='}},
         {"\\[\\([0-9]*\\)>\\]",               {1,             ')'}},
         {"\\[\\([0-9]*\\)<\\]",               {1,             '('}},
+        {"\\([0-9]*\\)=.",                    {1,             '.'}},
         // Questionable: optimize empty loops to nothing. Otherwise
         // these are endless loops, which make no sense, right?
         {"\\[\\]",                            {                 0}},
@@ -157,7 +158,10 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                                 *memory = c;
                         break;
                 case '.':
-                        putc(*memory, outfile);
+                        /* Faulty command.number == 1, but it'll do. */
+                        putc((command.number == 1
+                              ? *memory
+                              : command.number), outfile);
                         break;
                 case '[':
                         // Stolen from microbf, will refactor later.
