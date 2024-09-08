@@ -102,14 +102,13 @@ int optimize_file (FILE *infile, FILE *outfile)
 
 struct command {
         int number;
-        bool special;
         char command;
 };
 
 int parse_file (FILE *codefile, struct command *commands)
 {
         withreg(reg, rmatches,
-                "\\([0-9]\\{0,\\}\\)\\(\\^\\)\\{0,1\\}\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=(){}-]\\)");
+                "\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=(){}-]\\)");
         struct command current = {1};
         char str[1000000];
         while (fgets(str, 1000000, codefile)) {
@@ -119,20 +118,14 @@ int parse_file (FILE *codefile, struct command *commands)
                                 = (rmatches[1].rm_so == rmatches[1].rm_eo)
                                 ? 1
                                 : atoi(buf + rmatches[1].rm_so);
-                        current.special
-                                = rmatches[2].rm_so != rmatches[2].rm_eo;
-                        // TODO: rmatches[3] is numbered arg to the
-                        // special command.
                         current.command
-                                = buf[rmatches[4].rm_so];
-
+                                = buf[rmatches[2].rm_so];
                         commands->number = current.number;
-                        commands->special = current.special;
                         commands->command = current.command;
-                        current.command = current.special = 0;
+                        current.command = 0;
                         current.number = 1;
                         ++commands;
-                        buf += rmatches[4].rm_eo;
+                        buf += rmatches[2].rm_eo;
                 }
         }
         return EXIT_SUCCESS;
@@ -230,8 +223,7 @@ int main (int argc, char *argv[argc])
         case 'r':
                 parse_file(infile, commands);
                 /* for (int i = 0; commands[i].command; ++i) */
-                /*         printf("%s command %c on %d\n", */
-                /*                (commands[i].special ? "Special" : "Regular"), */
+                /*         printf("Command %c on %d\n", */
                 /*                commands[i].command, commands[i].number); */
                 return eval_commands(commands, stdin, stdout);
         }
