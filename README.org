@@ -54,13 +54,15 @@ You can do that:
 So you better split the stages and run the minified/optimized file when it's ready.)
 
 * Optimized Code Specification (WIP)
-** Simple commands
+
+** Monadic commands
 - [, ], ., , :: Like in Brainfuck
 - +, -, <, > :: Like in Brainfuck, except they can have a numeric argument specifying how many times to repeat them.
 - = :: Set the contents of the cell to numeric argument.
-** Binary commands
+
+** Diadic commands
 - offset`multiplier{ and offset`multiplier} :: Copy to the left and copy to the right respectively. ~offset~ defines far (= number of cells) to copy the data, ~multiplier~ defines how to scale this data.
-- ( and ) :: Scan the memory (to the left and right respectively) for zero cell and stop there. Numeric argument defines how many cells to skip though.
+- step`value( and step`value) :: Scan the memory (to the left and right respectively) for ~value~ cells and stop there, nulling them. ~step~ defines how many cells to skip through.
 
 * History
 
