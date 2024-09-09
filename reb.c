@@ -125,31 +125,37 @@ struct command {
         char command;
 };
 
+bool regpresent(regmatch_t *pmatch)
+{
+        return pmatch->rm_so != pmatch->rm_eo;
+}
+
 int parse_file (FILE *codefile, struct command *commands)
 {
         withreg(reg, rmatches,
-                "\\([0-9]\\{0,\\}\\)`\\{0,1\\}\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=(){}-]\\)");
-        struct command current = {1};
+                "\\([0-9]\\{0,\\}\\)\\(`\\{0,1\\}\\)\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=(){}-]\\)");
+        struct command current = {1, 1};
         char str[1000000];
         while (fgets(str, 1000000, codefile)) {
                 char *buf = str;
-                while (regmatch(&reg, buf, rmatches)){
-                        current.argument
-                                = ((rmatches[1].rm_so == rmatches[1].rm_eo)
-                                   ? 1
-                                   : atoi(buf + rmatches[1].rm_so));
-                        current.offset
-                                = ((rmatches[2].rm_so == rmatches[2].rm_eo)
-                                   ? 0
-                                   : atoi(buf + rmatches[2].rm_so));
+                while (regmatch(&reg, buf, rmatches)) {
+                        bool tick = regpresent(&rmatches[2]);
+                        if (tick && regpresent(&rmatches[3]))
+                                current.argument = atoi(buf + rmatches[3].rm_so);
+                        else if (!tick && regpresent(&rmatches[1]))
+                                current.argument = atoi(buf + rmatches[1].rm_so);
+                        // Faulty: offset is there only if there is
+                        // argument.
+                        if (tick && regpresent(&rmatches[1]))
+                                current.offset = atoi(buf + rmatches[1].rm_so);
                         current.command
-                                = buf[rmatches[3].rm_so];
+                                = buf[rmatches[4].rm_so];
                         commands->argument = current.argument;
                         commands->command = current.command;
-                        current.command = 0;
-                        current.argument = 1;
+                        commands->offset = current.offset;
+                        current.argument = current.offset = 1;
                         ++commands;
-                        buf += rmatches[3].rm_eo;
+                        buf += rmatches[4].rm_eo;
                 }
         }
         return EXIT_SUCCESS;
