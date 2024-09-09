@@ -42,10 +42,10 @@ struct optimization optimizations[] = {
         {"\\(>\\{2,\\}\\)",                   {matchlen(1),   '>'}},
         {"\\(<\\{2,\\}\\)",                   {matchlen(1),   '<'}},
         // Copying.
-        {"\\[\\([0-9]*\\)>+\\1<-\\]",         {1,             '}'}},
-        {"\\[\\([0-9]*\\)<+\\1>-\\]",         {1,             '{'}},
-        {"\\[-\\([0-9]*\\)>+\\1<\\]",         {1,             '}'}},
-        {"\\[-\\([0-9]*\\)<+\\1>\\]",         {1,             '{'}},
+        {"\\[\\([0-9]*\\)>+\\1<-\\]",         {1, '`',        '}'}},
+        {"\\[\\([0-9]*\\)<+\\1>-\\]",         {1, '`',        '{'}},
+        {"\\[-\\([0-9]*\\)>+\\1<\\]",         {1, '`',        '}'}},
+        {"\\[-\\([0-9]*\\)<+\\1>\\]",         {1, '`',        '{'}},
         // Misc
         {"\\[[0-9]*[+-]\\]",                  {'0',           '='}},
         {"0=\\([0-9]*\\)+",                   {1,             '='}},
@@ -207,11 +207,11 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                         *memory = command.argument;
                         break;
                 case '}':
-                        *(memory+command.argument) += *memory;
+                        *(memory+command.offset) += *memory;
                         *memory = 0;
                         break;
                 case '{':
-                        *(memory-command.argument) += *memory;
+                        *(memory-command.offset) += *memory;
                         *memory = 0;
                         break;
                 case ')':
