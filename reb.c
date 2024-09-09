@@ -186,11 +186,11 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                         *memory = command.number;
                         break;
                 case '}':
-                        *(memory+command.number) = *memory;
+                        *(memory+command.number) += *memory;
                         *memory = 0;
                         break;
                 case '{':
-                        *(memory-command.number) = *memory;
+                        *(memory-command.number) += *memory;
                         *memory = 0;
                         break;
                 case ')':
