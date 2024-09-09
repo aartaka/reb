@@ -2,8 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <ctype.h>
+
+#if !defined(__STDC__) || __STDC_VERSION__ < 199901L
+#error "Reb uses C99 features, procure a compliant compiler!"
+#endif
+
+#if (__STDC_VERSION__ >= 199901L && __STDC_VERSION__ < 202000L)
+#include <stdbool.h>
+#endif
 
 #ifndef MEMSIZE
 #define MEMSIZE 100000
