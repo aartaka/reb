@@ -29,7 +29,7 @@ struct optimization {
 
 struct optimization optimizations[] = {
         // Minification
-        {"[^][+.,<>!#-]",                     {               0}},
+        {"[^][+.,<>!#-]",                     {                 0}},
         // Questionable: optimize empty loops to nothing. Otherwise
         // these are endless loops, which make no sense, right?
         {"\\[\\]",                            {                 0}},
@@ -37,10 +37,10 @@ struct optimization optimizations[] = {
         {"^\\[[^][]*\\]",                     {                 0}},
         {"\\]\\[[^][]*\\]",                   {']'               }},
         // Duplicates.
-        {"\\(+\\{2,\\}\\)",                   {matchlen(1), '+'}},
-        {"\\(-\\{2,\\}\\)",                   {matchlen(1), '-'}},
-        {"\\(>\\{2,\\}\\)",                   {matchlen(1), '>'}},
-        {"\\(<\\{2,\\}\\)",                   {matchlen(1), '<'}},
+        {"\\(+\\{2,\\}\\)",                   {matchlen(1),   '+'}},
+        {"\\(-\\{2,\\}\\)",                   {matchlen(1),   '-'}},
+        {"\\(>\\{2,\\}\\)",                   {matchlen(1),   '>'}},
+        {"\\(<\\{2,\\}\\)",                   {matchlen(1),   '<'}},
         // Copying.
         {"\\[\\([0-9]*\\)>+\\1<-\\]",         {1,             '}'}},
         {"\\[\\([0-9]*\\)<+\\1>-\\]",         {1,             '{'}},
