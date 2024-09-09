@@ -28,7 +28,6 @@ struct optimization optimizations[] = {
         {"\\[\\]",                            {                 0}},
         // Comment loops
         {"^\\[[^][]*\\]",                     {                 0}},
-        {"^\\[.*\\]",                         {                 0}},
         {"\\]\\[[^][]*\\]",                   {']'               }},
         // Duplicates.
         {"\\(+\\{2,\\}\\)",                   {matchlen(1), '+'}},
