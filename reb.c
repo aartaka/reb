@@ -49,8 +49,13 @@ struct optimization optimizations[] = {
         // Misc
         {"\\[[0-9]*[+-]\\]",                  {'0',           '='}},
         {"0=\\([0-9]*\\)+",                   {1,             '='}},
-        {"\\[\\([0-9]*\\)>\\]",               {1,             ')'}},
-        {"\\[\\([0-9]*\\)<\\]",               {1,             '('}},
+        // Scan/beacon loops
+        {"\\[\\([0-9]*\\)>\\]",               {1, '`', '0',   ')'}},
+        {"\\[\\([0-9]*\\)<\\]",               {1, '`', '0',   '('}},
+        {"-\\[+\\([0-9]*\\)<-\\]",            {1, '`', '1',   '('}},
+        {"-\\[+\\([0-9]*\\)>-\\]",            {1, '`', '1',   '('}},
+        {"+\\[-\\([0-9]*\\)<+\\]",            {1, '`', '2','5','5', '('}},
+        {"+\\[-\\([0-9]*\\)>+\\]",            {1, '`', '2','5','5', ')'}},
         // No-ops
         {"\\([0-9]*\\)<\\1>",                 {                 0}},
         {"\\([0-9]*\\)>\\1<",                 {                 0}},
@@ -215,10 +220,12 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                         *memory = 0;
                         break;
                 case ')':
-                        for (; *memory; memory += command.argument);
+                        for (; *memory != command.argument; memory += command.offset);
+                        *memory = 0;
                         break;
                 case '(':
-                        for (; *memory; memory -= command.argument);
+                        for (; *memory != command.argument; memory -= command.offset);
+                        *memory = 0;
                         break;
                 case '#':
                         for (int i = 0, max = (command.argument == 1 ? 10 : command.argument); i < max; ++i)
