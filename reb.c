@@ -203,6 +203,8 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                         break;
                 case '#':
                         for (int i = 0, max = (command.number == 1 ? 10 : command.number); i < max; ++i)
+                                // Print the num/char cells with
+                                // current cell [wrapped] in brackets.
                                 fprintf(outfile,
                                         "%c%d/%c%c",
                                         ((memory + i - max / 2) == memory ? '[' : ' '),
