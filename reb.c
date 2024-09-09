@@ -103,7 +103,8 @@ int optimize_file (FILE *infile, FILE *outfile)
                 for (int iter = 0; iter < 5; ++iter)
                         // Ignoring minimization rule on later passes.
                         for (size_t i = (iter ? 1 : 0);
-                             i < sizeof(optimizations) / sizeof(struct optimization);
+                             i < (sizeof(optimizations)
+                                  / sizeof(struct optimization));
                              ++i)
                                 replace_pattern(str, optimizations[i]);
                 fputs(str, outfile);
