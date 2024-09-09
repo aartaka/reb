@@ -55,7 +55,7 @@ struct optimization optimizations[] = {
         regmatch_t matchvar[1000];              \
         regcomp(&regvar, __VA_ARGS__, 0);
 
-int regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
+bool regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
         return !regexec(preg, str, 1000, pmatch, 0);
 }
