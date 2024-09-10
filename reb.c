@@ -139,19 +139,23 @@ bool regpresent(regmatch_t *pmatch)
         return pmatch->rm_so != pmatch->rm_eo;
 }
 
-FILE *bfin;
-
-int parse_file (FILE *codefile, struct command *commands)
+void
+parse_file (FILE *codefile, struct command *commands, FILE **infile)
 {
         withreg(reg, rmatches, OP_REGEX);
         struct command current = {1, 1};
         char c, str[1000000] = {0}, *buf = str;
-        while((c = fgetc(codefile)) != EOF)
-                if ('!' == c)
-                        return (bfin = codefile, EXIT_FAILURE);
-                else if (!strchr("0123456789`" COMMAND_CHARS, *buf++ = c))
-                        return printf("Character '%c' is not recognized by Reb\n\
+        while((c = fgetc(codefile)) != EOF) {
+                if ('!' == c) {
+                        *infile = codefile;
+                        return;
+                }
+                else if (!strchr("0123456789`" COMMAND_CHARS, *buf++ = c)) {
+                        printf("Character '%c' is not recognized by Reb\n\
 Clean or minify the input first, otherwise expect breakages.\n", c);
+                        abort();
+                }
+        }
         buf = str;
         while (regmatch(&reg, buf, rmatches)) {
                 bool tick = regpresent(&rmatches[2]);
@@ -172,7 +176,6 @@ Clean or minify the input first, otherwise expect breakages.\n", c);
                 ++commands;
                 buf += rmatches[4].rm_eo;
         }
-        return EXIT_SUCCESS;
 }
 
 CELLTYPE memory_[MEMSIZE] = {0};
@@ -257,6 +260,7 @@ int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
 int main (int argc, char *argv[argc])
 {
         FILE *infile;
+        FILE *bfin = stdin;
         if (argc == 2)
                 infile = stdin;
         else if (argc > 2 && !strcmp(argv[2], "--"))
@@ -270,11 +274,11 @@ int main (int argc, char *argv[argc])
         case 'o':
                 return optimize_file(infile, stdout);
         case 'r':
-                parse_file(infile, commands);
+                parse_file(infile, commands, &bfin);
                 /* for (int i = 0; commands[i].command; ++i) */
                 /*         printf("Command %c on %d over %d\n", */
                 /*                commands[i].command, commands[i].argument, commands[i].offset); */
-                return eval_commands(commands, (bfin ? bfin : stdin), stdout);
+                return eval_commands(commands, bfin, stdout);
         }
         return EXIT_SUCCESS;
 }
