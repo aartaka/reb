@@ -20,6 +20,10 @@
 #define CELLTYPE char
 #endif
 
+#define COMMAND_CHARS "][+.,<>!#=(){}-"
+#define OP_REGEX                                                        \
+        "\\([0-9]*\\)\\(`\\{0,1\\}\\)\\([0-9]*\\)\\([" COMMAND_CHARS "]\\)"
+
 #define matchlen(match) 15+match
 
 struct optimization {
@@ -137,31 +141,33 @@ bool regpresent(regmatch_t *pmatch)
 
 int parse_file (FILE *codefile, struct command *commands)
 {
-        withreg(reg, rmatches,
-                "\\([0-9]\\{0,\\}\\)\\(`\\{0,1\\}\\)\\([0-9]\\{0,\\}\\)\\([][+.,<>!#=(){}-]\\)");
+        withreg(reg, rmatches, OP_REGEX);
         struct command current = {1, 1};
-        char str[1000000];
-        while (fgets(str, 1000000, codefile)) {
-                char *buf = str;
-                while (regmatch(&reg, buf, rmatches)) {
-                        bool tick = regpresent(&rmatches[2]);
-                        if (tick && regpresent(&rmatches[3]))
-                                current.argument = atoi(buf + rmatches[3].rm_so);
-                        else if (!tick && regpresent(&rmatches[1]))
-                                current.argument = atoi(buf + rmatches[1].rm_so);
-                        // Faulty: offset is there only if there is
-                        // argument.
-                        if (tick && regpresent(&rmatches[1]))
-                                current.offset = atoi(buf + rmatches[1].rm_so);
-                        current.command
-                                = buf[rmatches[4].rm_so];
-                        commands->argument = current.argument;
-                        commands->command = current.command;
-                        commands->offset = current.offset;
-                        current.argument = current.offset = 1;
-                        ++commands;
-                        buf += rmatches[4].rm_eo;
-                }
+        char c, str[1000000] = {0};
+        char *buf = str;
+        while((c = fgetc(codefile)) != EOF)
+                if (!strchr("0123456789`" COMMAND_CHARS, *buf++ = c))
+                        printf("Character '%c' is not recognised by Reb\n\
+Clean or minify the input first, otherwise expect breakages.\n", c);
+        buf = str;
+        while (regmatch(&reg, buf, rmatches)) {
+                bool tick = regpresent(&rmatches[2]);
+                if (tick && regpresent(&rmatches[3]))
+                        current.argument = atoi(buf + rmatches[3].rm_so);
+                else if (!tick && regpresent(&rmatches[1]))
+                        current.argument = atoi(buf + rmatches[1].rm_so);
+                // Faulty: offset is there only if there is
+                // argument.
+                if (tick && regpresent(&rmatches[1]))
+                        current.offset = atoi(buf + rmatches[1].rm_so);
+                current.command
+                        = buf[rmatches[4].rm_so];
+                commands->argument = current.argument;
+                commands->command = current.command;
+                commands->offset = current.offset;
+                current.argument = current.offset = 1;
+                ++commands;
+                buf += rmatches[4].rm_eo;
         }
         return EXIT_SUCCESS;
 }
