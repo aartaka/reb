@@ -150,7 +150,7 @@ int parse_file (FILE *codefile, struct command *commands)
                 if ('!' == c)
                         return (bfin = codefile, EXIT_FAILURE);
                 else if (!strchr("0123456789`" COMMAND_CHARS, *buf++ = c))
-                        printf("Character '%c' is not recognized by Reb\n\
+                        return printf("Character '%c' is not recognized by Reb\n\
 Clean or minify the input first, otherwise expect breakages.\n", c);
         buf = str;
         while (regmatch(&reg, buf, rmatches)) {
