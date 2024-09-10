@@ -20,7 +20,7 @@
 #define CELLTYPE char
 #endif
 
-#define COMMAND_CHARS "][+.,<>!#=(){}-"
+#define COMMAND_CHARS "][+.,<>#=(){}-"
 #define OP_REGEX                                                        \
         "\\([0-9]*\\)\\(`\\{0,1\\}\\)\\([0-9]*\\)\\([" COMMAND_CHARS "]\\)"
 
@@ -139,14 +139,17 @@ bool regpresent(regmatch_t *pmatch)
         return pmatch->rm_so != pmatch->rm_eo;
 }
 
+FILE *bfin;
+
 int parse_file (FILE *codefile, struct command *commands)
 {
         withreg(reg, rmatches, OP_REGEX);
         struct command current = {1, 1};
-        char c, str[1000000] = {0};
-        char *buf = str;
+        char c, str[1000000] = {0}, *buf = str;
         while((c = fgetc(codefile)) != EOF)
-                if (!strchr("0123456789`" COMMAND_CHARS, *buf++ = c))
+                if ('!' == c)
+                        return (bfin = codefile, EXIT_FAILURE);
+                else if (!strchr("0123456789`" COMMAND_CHARS, *buf++ = c))
                         printf("Character '%c' is not recognized by Reb\n\
 Clean or minify the input first, otherwise expect breakages.\n", c);
         buf = str;
@@ -271,7 +274,7 @@ int main (int argc, char *argv[argc])
                 /* for (int i = 0; commands[i].command; ++i) */
                 /*         printf("Command %c on %d over %d\n", */
                 /*                commands[i].command, commands[i].argument, commands[i].offset); */
-                return eval_commands(commands, stdin, stdout);
+                return eval_commands(commands, (bfin ? bfin : stdin), stdout);
         }
         return EXIT_SUCCESS;
 }
