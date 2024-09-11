@@ -208,6 +208,8 @@ eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                 case ',':
                         if ((c = getc(infile)) != EOF)
                                 *memory = c;
+                        else
+                                *memory = 0;
                         break;
                 case '.':
                         putc(*memory, outfile);
