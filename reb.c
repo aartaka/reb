@@ -266,7 +266,8 @@ int main (int argc, char *argv[argc])
 {
         FILE *infile;
         FILE *bfin = stdin;
-        if (1 == argc) {
+        if (1 == argc
+            || (argc >= 2 && !strchr("mor", argv[1][0]))) {
                 printf("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
 %s\tm[inify]   FILE/-- \tMinify the FILE and output the result.\n\
