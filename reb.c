@@ -69,12 +69,14 @@ struct optimization {
         regmatch_t matchvar[1000];              \
         regcomp(&regvar, __VA_ARGS__, 0);
 
-bool regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
+bool
+regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
         return !regexec(preg, str, 1000, pmatch, 0);
 }
 
-char *replace_pattern (char *str, struct optimization opt)
+char *
+replace_pattern (char *str, struct optimization opt)
 {
         withreg(reg, rmatch, opt.pattern);
         char copy[10000];
@@ -99,7 +101,8 @@ char *replace_pattern (char *str, struct optimization opt)
         return str;
 }
 
-int minify_file (FILE *infile, FILE *outfile)
+int
+minify_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         // Minification pattern is the first optimization.
@@ -109,7 +112,8 @@ int minify_file (FILE *infile, FILE *outfile)
         return EXIT_SUCCESS;
 }
 
-int optimize_file (FILE *infile, FILE *outfile)
+int
+optimize_file (FILE *infile, FILE *outfile)
 {
         char str[10000];
         while (fgets(str, 10000, infile)) {
@@ -132,7 +136,8 @@ struct command {
         char command;
 };
 
-bool regpresent(regmatch_t *pmatch)
+bool
+regpresent(regmatch_t *pmatch)
 {
         return pmatch->rm_so != pmatch->rm_eo;
 }
@@ -179,7 +184,8 @@ Clean or minify the input first, otherwise expect breakages.\n", c);
 CELLTYPE memory_[MEMSIZE] = {0};
 CELLTYPE *memory = &memory_[MEMSIZE/2];
 
-int eval_commands (struct command *commands, FILE *infile, FILE *outfile)
+int
+eval_commands (struct command *commands, FILE *infile, FILE *outfile)
 {
         int depth = 0;
         for (size_t i = 0; commands[i].command; ++i) {
