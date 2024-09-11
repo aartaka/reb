@@ -149,11 +149,12 @@ parse_file (FILE *codefile, struct command *commands, FILE **infile)
         struct command current = {1, 1};
         char c, str[1000000] = {0}, *buf = str;
         while((c = fgetc(codefile)) != EOF) {
-                if ('!' == c) {
+                if ('\r' == c) {
+                        continue;
+                } else if ('!' == c) {
                         *infile = codefile;
                         break;
-                }
-                else if (!strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
+                } else if (!strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
                         printf("Character '%c' is not recognized by Reb\n\
 Clean or minify the input first, otherwise expect breakages.\n", c);
                         abort();
