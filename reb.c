@@ -250,11 +250,10 @@ eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                                 // Print the num/char cells with
                                 // current cell [wrapped] in brackets.
                                 fprintf(outfile,
-                                        "%c%d/%c%c",
-                                        ((memory + i - max / 2) == memory ? '[' : ' '),
+                                        "%s%d/%c ",
+                                        ((memory + i - max / 2) == memory ? "^" : ""),
                                         *(memory + i - max / 2),
-                                        *(memory + i - max / 2),
-                                        ((memory + i - max / 2) == memory ? ']' : ' '));
+                                        *(memory + i - max / 2));
                         fputs("\n", outfile);
                         break;
                 }
