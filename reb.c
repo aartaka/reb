@@ -249,7 +249,7 @@ eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                 case '#':
                         for (int i = 0, max = (command.argument == 1 ? 10 : command.argument); i < max; ++i)
                                 // Print the num/char cells with
-                                // current cell [wrapped] in brackets.
+                                // ^-prefixed current cell
                                 fprintf(outfile,
                                         "%s%d/%c ",
                                         ((memory + i - max / 2) == memory ? "^" : ""),
