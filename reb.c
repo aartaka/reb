@@ -265,6 +265,14 @@ int main (int argc, char *argv[argc])
 {
         FILE *infile;
         FILE *bfin = stdin;
+        if (1 == argc) {
+                printf("Reb is a Brainfuck toolkit using regex for everything.\n\
+Available commands:\n\
+\tm[inify]   FILE \tMinify the FILE and output the result.\n\
+\to[ptimize] FILE \tOutput more efficient Reb format for FILE.\n\
+\tr[un]      FILE \tRun the (minified or optimized) contents of the FILE.\n");
+                return EXIT_SUCCESS;
+        }
         if (argc == 2)
                 infile = stdin;
         else if (argc > 2 && !strcmp(argv[2], "--"))
