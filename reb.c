@@ -148,7 +148,7 @@ parse_file (FILE *codefile, struct command *commands, FILE **infile)
         withreg(reg, rmatches, OP_REGEX);
         struct command current = {1, 1};
         char c, str[1000000] = {0}, *buf = str;
-        while((c = fgetc(codefile)) != EOF) {
+        while(EOF != (c = fgetc(codefile))) {
                 if ('\r' == c) {
                         continue;
                 } else if ('!' == c) {
@@ -207,7 +207,7 @@ eval_commands (struct command *commands, FILE *infile, FILE *outfile)
                         memory -= command.argument;
                         break;
                 case ',':
-                        if ((c = getc(infile)) != EOF)
+                        if (EOF != (c = getc(infile)))
                                 *memory = c;
                         else
                                 *memory = 0;
@@ -275,7 +275,7 @@ Available commands:\n\
                        argv[0], argv[0], argv[0]);
                 return EXIT_SUCCESS;
         }
-        if (argc == 2)
+        if (2 == argc)
                 infile = stdin;
         else if (argc > 2 && !strcmp(argv[2], "--"))
                 infile = stdin;
