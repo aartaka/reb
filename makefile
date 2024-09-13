@@ -5,5 +5,5 @@ all: reb
 clean:
 	rm reb
 
-install: sade
-	$(INSTALL) sade $(DESTDIR)/
+install: reb
+	$(INSTALL) reb $(DESTDIR)/
