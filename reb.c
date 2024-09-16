@@ -135,6 +135,36 @@ optimize_file(FILE *infile, FILE *outfile)
 	return EXIT_SUCCESS;
 }
 
+int
+format_file(FILE *infile, FILE *outfile)
+{
+	withreg(blank_reg, blank_matches, "^[[:space:]]*$");
+	withreg(normal_reg, normal_matches, "^[[:space:]]*\\(.*\\)$");
+	char str[10000];
+	int depth = 0;
+	while (fgets(str, 10000, infile)) {
+		if (regmatch(&blank_reg, str, blank_matches)) {
+			fputs("\n", outfile);
+		} else if (regmatch(&normal_reg, str, normal_matches)) {
+			char *buf = str;
+			int leading_close_brackets = 0;
+			buf += normal_matches[1].rm_so;
+			while (']' == *buf)
+				leading_close_brackets++, buf++;
+			depth -= leading_close_brackets;
+			for (int i = 0; i < depth; ++i)
+				fputc(' ', outfile);
+			while (leading_close_brackets--)
+				fputc(']', outfile);
+			while (*buf) {
+				depth += ('[' == *buf) - (']' == *buf);
+				fputc(*buf++, outfile);
+			}
+		}
+	}
+	return EXIT_SUCCESS;
+}
+
 struct command {
 	int argument;
 	int offset;
@@ -281,13 +311,15 @@ main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;
-	if (1 == argc || (argc >= 2 && !strchr("mor", argv[1][0]))) {
+	if (1 == argc || (argc >= 2 && !strchr("mfor", argv[1][0]))) {
 		printf
-		    ("Reb is a Brainfuck toolkit using regex for everything.\n\
+                        ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
 %s\tm[inify]   FILE/--\tMinify the FILE and output the result.\n\
+%s\tf[ormat]   FILE/--\tFormat the FILE as per bf.style.\n\
 %s\to[ptimize] FILE/--\tOutput more efficient Reb format for FILE.\n\
-%s\tr[un]      FILE/--\tRun the (minified or optimized) contents of the FILE.\n", argv[0], argv[0], argv[0]);
+%s\tr[un]      FILE/--\tRun the (minified or optimized) contents of the FILE.\n",
+                         argv[0], argv[0], argv[0], argv[0]);
 		return EXIT_SUCCESS;
 	}
 	if (2 == argc)
@@ -300,6 +332,8 @@ Available commands:\n\
 	switch (argv[1][0]) {
 	case 'm':
 		return minify_file(infile, stdout);
+	case 'f':
+		return format_file(infile, stdout);
 	case 'o':
 		return optimize_file(infile, stdout);
 	case 'r':
