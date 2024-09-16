@@ -316,7 +316,7 @@ main(int argc, char *argv[argc])
                         ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
 %s\tm[inify]   FILE/--\tMinify the FILE and output the result.\n\
-%s\tf[ormat]   FILE/--\tFormat the FILE as per bf.style.\n\
+%s\tf[ormat]   FILE/--\tFormat the FILE as per bf.style and output the result.\n\
 %s\to[ptimize] FILE/--\tOutput more efficient Reb format for FILE.\n\
 %s\tr[un]      FILE/--\tRun the (minified or optimized) contents of the FILE.\n",
                          argv[0], argv[0], argv[0], argv[0]);
