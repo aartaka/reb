@@ -8,7 +8,7 @@
 #error "Reb uses C99 features, procure a compliant compiler!"
 #endif
 
-#if (__STDC_VERSION__ >= 199901L && __STDC_VERSION__ < 202000L)
+#if (__STDC_VERSION__ < 202000L)
 #include <stdbool.h>
 #endif
 
