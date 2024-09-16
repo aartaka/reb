@@ -1,7 +1,7 @@
 #+TITLE:Reb—regex-based Brainfuck toolkit
 
 Reb is a CLI tool for working with Brainfuck. Right now, it supports:
-- Code minification.
+- Code minification and formatting.
 - Pattern optimization.
 - And evaluation of both Brainfuck and optimized code format.
 
