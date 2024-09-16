@@ -12,6 +12,8 @@
 #include <stdbool.h>
 #endif
 
+#define is ==
+
 #ifndef MEMSIZE
 #define MEMSIZE 100000
 #endif
@@ -66,7 +68,7 @@ struct optimization {
 	{"\\([0-9]*\\)[=+-],",                    {             ','}},
 };
 // *INDENT-ON*
-//
+
 #define withreg(regvar, matchvar, ...)          \
         regex_t regvar;                         \
         regmatch_t matchvar[1000];              \
@@ -151,7 +153,7 @@ format_file(FILE *infile, FILE *outfile)
 			char *buf = str;
 			int leading_close_brackets = 0;
 			buf += normal_matches[1].rm_so;
-			while (']' == *buf)
+			while (*buf is ']')
 				leading_close_brackets++, buf++;
 			depth -= leading_close_brackets;
 			for (int i = 0; i < depth; ++i)
@@ -159,7 +161,7 @@ format_file(FILE *infile, FILE *outfile)
 			while (leading_close_brackets--)
 				fputc(']', outfile);
 			while (*buf) {
-				depth += ('[' == *buf) - (']' == *buf);
+				depth += (*buf is '[') - (*buf is ']');
 				fputc(*buf++, outfile);
 			}
 		}
@@ -186,9 +188,9 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 	struct command current = { 1, 1 };
 	char c, str[1000000] = { 0 }, *buf = str;
 	while (EOF != (c = fgetc(codefile))) {
-		if ('\r' == c) {
+		if (c is '\r') {
 			continue;
-		} else if ('!' == c) {
+		} else if (c is '!') {
 			*infile = codefile;
 			break;
 		} else if (!strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
@@ -255,15 +257,15 @@ eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 		case '[':
 			// Stolen from microbf, will refactor later.
 			if (!*memory)
-				while ((depth += (commands[i].command == '[')
-					- (commands[i].command == ']')))
+				while ((depth += (commands[i].command is '[')
+					- (commands[i].command is ']')))
 					i++;
 			break;
 		case ']':
 			// Stolen from microbf, will refactor later.
 			if (*memory)
-				while ((depth += (commands[i].command == ']')
-					- (commands[i].command == '[')))
+				while ((depth += (commands[i].command is ']')
+					- (commands[i].command is '[')))
 					i--;
 			break;
 		case '=':
@@ -313,7 +315,7 @@ main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;
-	if (1 == argc || (argc >= 2 && !strchr("mfor", argv[1][0]))) {
+	if (argc == 1 || (argc >= 2 && !strchr("mfor", argv[1][0]))) {
 		printf
 		    ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
@@ -323,7 +325,7 @@ Available commands:\n\
 %s\tr[un]      FILE/--\tRun the (minified or optimized) contents of the FILE.\n", argv[0], argv[0], argv[0], argv[0]);
 		return EXIT_SUCCESS;
 	}
-	if (2 == argc)
+	if (argc == 2)
 		infile = stdin;
 	else if (argc > 2 && !strcmp(argv[2], "--"))
 		infile = stdin;
