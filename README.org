@@ -29,8 +29,9 @@ Use it:
 
 * Usage
 
-There are three main commands in Reb:
+There are four main commands in Reb:
 - m :: minification.
+- f :: formatting (as per [[https://github.com/bf-enterprise-solutions/bf.style][bf.style]].)
 - o :: optimization.
 - r :: evaluation (from "run").
 
