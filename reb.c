@@ -261,10 +261,10 @@ eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 			for (int i = 0, max =
 			     (command.argument == 1 ? 10 : command.argument);
 			     i < max; ++i)
-				// Print the num/char cells with
-				// ^-prefixed current cell
+				// Print the []-wrapped num/char cells
+				// with ^-prefixed current cell
 				fprintf(outfile,
-					"%s%d/%c ",
+					"[%s%d/%c] ",
 					((memory + i - max / 2) ==
 					 memory ? "^" : ""),
 					*(memory + i - max / 2),
