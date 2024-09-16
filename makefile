@@ -1,6 +1,9 @@
-.PHONY: clean all install
+.PHONY: clean indent all install
 
 all: reb
+
+indent: reb.c
+	indent -linux --procnames-start-lines $^
 
 clean:
 	rm reb
