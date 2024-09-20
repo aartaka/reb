@@ -3,10 +3,10 @@
 all: reb
 
 indent: reb.c
-	indent --k-and-r-style --indent-level8 --tab-size8 --procnames-start-lines $^
+	-indent --k-and-r-style --indent-level8 --tab-size8 --procnames-start-lines $^
 
 clean:
-	rm reb
+	-rm reb
 
 install: reb
 	$(INSTALL) reb $(DESTDIR)$(PREFIX)/bin
