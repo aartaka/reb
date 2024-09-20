@@ -68,6 +68,7 @@ struct optimization {
 	{"\\([0-9]*\\)[=+-],",                    {             ','}},
 };
 // *INDENT-ON*
+
 #define withreg(regvar, matchvar, ...)          \
         regex_t regvar;                         \
         regmatch_t matchvar[1000];              \
@@ -335,7 +336,7 @@ Available commands:\n\
 		infile = stdin;
 	else
 		infile = fopen(argv[2], "r");
-	struct command commands[100000] = { {0} };
+	struct command commands[100000] = { { 0 } };
 	switch (argv[1][0]) {
 	case 'm':
 		return minify_file(infile, stdout);
