@@ -1,8 +1,8 @@
-#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <regex.h>
 
 #if !defined(__STDC__) || __STDC_VERSION__ < 199901L
 #error "Reb uses C99 features, procure a compliant compiler!"
