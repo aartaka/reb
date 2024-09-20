@@ -21,7 +21,8 @@
                       (let* ((out (assoc-ref outputs "out"))
                              (bin (string-append out "/bin")))
                         (mkdir-p bin)
-                        (install-file "reb" bin)))))))
+                        (install-file "reb" bin))))
+                  (delete 'validate-runpath))))
     (license license:wtfpl2)))
 
 reb
