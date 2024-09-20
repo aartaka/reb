@@ -68,7 +68,6 @@ struct optimization {
 	{"\\([0-9]*\\)[=+-],",                    {             ','}},
 };
 // *INDENT-ON*
-
 #define withreg(regvar, matchvar, ...)          \
         regex_t regvar;                         \
         regmatch_t matchvar[1000];              \
