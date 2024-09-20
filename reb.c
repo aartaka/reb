@@ -281,8 +281,13 @@ eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 			*memory = 0;
 			break;
 		case ')':
-			for (; *memory != command.argument;
-			     memory += command.offset) ;
+			if (command.offset is 1)
+				memory =
+				    memchr(memory, command.argument,
+					   MEMSIZE / 2);
+			else
+				for (; *memory != command.argument;
+				     memory += command.offset) ;
 			*memory = 0;
 			break;
 		case '(':
