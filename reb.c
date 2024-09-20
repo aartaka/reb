@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #endif
 
+#include <iso646.h>
 #define is ==
 
 #ifndef MEMSIZE
@@ -95,7 +96,7 @@ replace_pattern(char *str, struct optimization opt)
 					match.rm_eo - match.rm_so);
 				offset += match.rm_eo - match.rm_so;
 			} else if (15 < opt.replacement[i]
-				   && opt.replacement[i] < ' ') {
+				   and opt.replacement[i] < ' ') {
 				regmatch_t match =
 				    rmatch[opt.replacement[i] - 15];
 				offset +=
@@ -202,13 +203,13 @@ Clean or minify the input first, otherwise expect breakages.\n", c);
 	buf = str;
 	while (regmatch(&reg, buf, rmatches)) {
 		bool tick = regpresent(&rmatches[2]);
-		if (tick && regpresent(&rmatches[3]))
+		if (tick and regpresent(&rmatches[3]))
 			current.argument = atoi(buf + rmatches[3].rm_so);
-		else if (!tick && regpresent(&rmatches[1]))
+		else if (!tick and regpresent(&rmatches[1]))
 			current.argument = atoi(buf + rmatches[1].rm_so);
 		// Faulty: offset is there only if there is
 		// argument.
-		if (tick && regpresent(&rmatches[1]))
+		if (tick and regpresent(&rmatches[1]))
 			current.offset = atoi(buf + rmatches[1].rm_so);
 		current.command = buf[rmatches[4].rm_so];
 		commands->argument = current.argument;
@@ -320,7 +321,7 @@ main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;
-	if (argc == 1 || (argc >= 2 && !strchr("mfor", argv[1][0]))) {
+	if (argc == 1 or (argc >= 2 and !strchr("mfor", argv[1][0]))) {
 		printf
 		    ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
@@ -332,7 +333,7 @@ Available commands:\n\
 	}
 	if (argc == 2)
 		infile = stdin;
-	else if (argc > 2 && !strcmp(argv[2], "--"))
+	else if (argc > 2 and !strcmp(argv[2], "--"))
 		infile = stdin;
 	else
 		infile = fopen(argv[2], "r");
