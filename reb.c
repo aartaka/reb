@@ -34,8 +34,6 @@ struct optimization {
 	char *pattern;
 	char replacement[20];
 } optimizations[] = {
-	// Minification
-	{"[^][+.,<>!#-]",                         {               0}},
 	// Questionable: optimize empty loops to nothing. Otherwise
 	// these are endless loops, which make no sense, right?
 	{"\\[\\]",                                {               0}},
@@ -66,7 +64,8 @@ struct optimization {
 	{"\\([0-9]*\\)<\\1>",                     {               0}},
 	{"\\([0-9]*\\)>\\1<",                     {               0}},
 	{"\\([0-9]*\\)[=+-],",                    {             ','}},
-};
+},
+        minification = {"[^][+.,<>!#-]", {0}};
 // *INDENT-ON*
 
 #define withreg(regvar, matchvar, ...)          \
@@ -115,8 +114,6 @@ int
 minify_file(FILE *infile, FILE *outfile)
 {
 	char str[10000];
-	// Minification pattern is the first optimization.
-	struct optimization minification = optimizations[0];
 	while (fgets(str, 10000, infile))
 		fputs(replace_pattern(str, minification), outfile);
 	return EXIT_SUCCESS;
@@ -127,10 +124,11 @@ optimize_file(FILE *infile, FILE *outfile)
 {
 	char str[10000];
 	while (fgets(str, 10000, infile)) {
+                replace_pattern(str, minification);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
 			// Ignoring minimization rule on later passes.
-			for (size_t i = (iter ? 1 : 0);
+			for (size_t i = 0;
 			     i < (sizeof(optimizations)
 				  / sizeof(struct optimization)); ++i)
 				replace_pattern(str, optimizations[i]);
