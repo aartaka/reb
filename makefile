@@ -9,4 +9,4 @@ clean:
 	-rm reb
 
 install: reb
-	$(INSTALL) reb $(DESTDIR)$(PREFIX)/bin
+	$(INSTALL) reb $(DESTDIR)$(PREFIX)/bin/
