@@ -29,12 +29,11 @@
 
 #define matchlen(match) 15+match
 
+// *INDENT-OFF*
 struct optimization {
 	char *pattern;
 	char replacement[20];
-} optimizations[]
-// *INDENT-OFF*
-= {
+} optimizations[] = {
 	// Minification
 	{"[^][+.,<>!#-]",                         {               0}},
 	// Questionable: optimize empty loops to nothing. Otherwise
