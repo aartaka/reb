@@ -184,7 +184,7 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 {
 	withreg(reg, rmatches, OP_REGEX);
 	struct command current = { 1, 1 };
-	char c, str[1000000] = { 0 }, *buf = str;
+	char c, str[1000000], *buf = str;
 	while (EOF != (c = fgetc(codefile))) {
 		if (c is '\r') {
 			continue;
