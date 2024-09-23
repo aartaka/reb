@@ -193,7 +193,7 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 			break;
 		} else if (!strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
 			printf("Character '%c' is not recognized by Reb\n\
-Clean or minify the input first, otherwise expect breakages.\n", c);
+Clean or minify the input first.\n", c);
 			abort();
 		}
 	}
