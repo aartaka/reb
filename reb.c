@@ -124,13 +124,13 @@ optimize_file(FILE *infile, FILE *outfile)
 {
 	char str[10000];
 	while (fgets(str, 10000, infile)) {
-                replace_pattern(str, minification);
+		replace_pattern(str, minification);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
 			// Ignoring minimization rule on later passes.
-			for (size_t i = 0;
-			     i < (sizeof(optimizations)
-				  / sizeof(struct optimization)); ++i)
+			for (size_t i = 0; i < (sizeof(optimizations)
+						/ sizeof(struct optimization));
+			     ++i)
 				replace_pattern(str, optimizations[i]);
 		fputs(str, outfile);
 	}
@@ -202,7 +202,7 @@ Clean or minify the input first.\n", c);
 		bool tick = regpresent(&rmatches[2]);
 		if (tick and regpresent(&rmatches[3]))
 			current.argument = atoi(buf + rmatches[3].rm_so);
-		else if (!tick and regpresent(&rmatches[1]))
+		else if (not tick and regpresent(&rmatches[1]))
 			current.argument = atoi(buf + rmatches[1].rm_so);
 		// Faulty: offset is there only if there is
 		// argument.
@@ -318,7 +318,7 @@ main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;
-	if (argc is 1 or (argc >= 2 and !strchr("mfor", argv[1][0]))) {
+	if (argc is 1 or argc >= 2 and not strchr("mfor", argv[1][0])) {
 		printf
 		    ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
@@ -330,7 +330,7 @@ Available commands:\n\
 	}
 	if (argc is 2)
 		infile = stdin;
-	else if (argc > 2 and !strcmp(argv[2], "--"))
+	else if (argc > 2 and strcmp(argv[2], "--") is 0)
 		infile = stdin;
 	else
 		infile = fopen(argv[2], "r");
