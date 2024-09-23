@@ -70,12 +70,12 @@ struct optimization {
 
 #define withreg(regvar, matchvar, ...)          \
         regex_t regvar;                         \
-        regmatch_t matchvar[1000];              \
+        regmatch_t matchvar[10];                \
         regcomp(&regvar, __VA_ARGS__, 0);
 bool
 regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
-	return !regexec(preg, str, 1000, pmatch, 0);
+	return !regexec(preg, str, 10, pmatch, 0);
 }
 
 char *
