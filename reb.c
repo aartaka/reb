@@ -142,7 +142,7 @@ replace_pattern(char *str, struct optimization opt)
 	strcpy(copy, str);
 	while (regmatch(&reg, str, rmatch)) {
 		int offset = rmatch[0].rm_so;
-		for (int i = 0; opt.replacement[i]; ++i) {
+		for (size_t i = 0; opt.replacement[i]; ++i) {
 			// NOTE: Used to be < 32. 10-31 are undefined.
 			if (opt.replacement[i] < 10) {
 				regmatch_t match =
