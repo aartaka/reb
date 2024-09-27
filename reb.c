@@ -14,6 +14,7 @@
 
 #include <iso646.h>
 #define is ==
+#define success 0 ==
 
 #ifndef MEMSIZE
 #define MEMSIZE 100000
@@ -131,7 +132,7 @@ struct optimization {
 bool
 regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
-	return !regexec(preg, str, 10, pmatch, 0);
+	return success regexec(preg, str, 10, pmatch, 0);
 }
 
 char *
@@ -241,7 +242,7 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 		} else if (c is '!') {
 			*infile = codefile;
 			break;
-		} else if (!strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
+		} else if (success strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
 			printf("Character '%c' is not recognized by Reb\n\
 Clean or minify the input first.\n", c);
 			abort();
@@ -368,7 +369,7 @@ main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;
-	if (argc is 1 or argc >= 2 and not strchr("mfor", argv[1][0])) {
+	if (argc is 1 or argc >= 2 and success strchr("mfor", argv[1][0])) {
 		printf
 		    ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
@@ -380,7 +381,7 @@ Available commands:\n\
 	}
 	if (argc is 2)
 		infile = stdin;
-	else if (argc > 2 and strcmp(argv[2], "--") is 0)
+	else if (argc > 2 and success strcmp(argv[2], "--"))
 		infile = stdin;
 	else
 		infile = fopen(argv[2], "r");
