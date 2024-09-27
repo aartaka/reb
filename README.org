@@ -62,7 +62,7 @@ So you better split the stages and run the minified/optimized file when it's rea
 - = :: Set the contents of the cell to numeric argument.
 
 ** Diadic commands
-- offset`multiplier{ and offset`multiplier} :: Copy to the left and copy to the right respectively. ~offset~ defines far (= number of cells) to copy the data, ~multiplier~ defines how to scale this data.
+- offset`multiplier{ and offset`multiplier} :: Copy to the left and copy to the right respectively. ~offset~ defines how far (= number of cells) to copy the data, ~multiplier~ defines how to scale this data.
 - step`value( and step`value) :: Scan the memory (to the left and right respectively) for ~value~ cells and stop there, nulling them. ~step~ defines how many cells to skip through.
 
 * History
