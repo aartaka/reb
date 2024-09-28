@@ -121,7 +121,7 @@ struct optimization {
 	{"\\([0-9]*\\)<\\1>",                     {               0}},
 	{"\\([0-9]*\\)>\\1<",                     {               0}},
 	{"\\([0-9]*\\)[=+-],",                    {             ','}},
-}, minification = {"[^][+.,<>!#-]", {0}};
+}, minification = {"[^][+.,<>#-]", {0}};
 // *INDENT-ON*
 
 #define withreg(regvar, matchvar, ...)          \
