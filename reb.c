@@ -373,7 +373,13 @@ Available commands:\n\
 %s\tm[inify]   FILE/--\tMinify the FILE and output the result.\n\
 %s\tf[ormat]   FILE/--\tFormat the FILE as per bf.style and output the result.\n\
 %s\to[ptimize] FILE/--\tOutput more efficient Reb format for FILE.\n\
-%s\tr[un]      FILE/--\tRun the (minified or optimized) contents of the FILE.\n", argv[0], argv[0], argv[0], argv[0]);
+%s\tr[un]      FILE/--\tRun the (minified or optimized) contents of the FILE.\n\
+\n\
+Reb supports:\n\
+- Arbitrary precision cells, via compile-time macro CELLTYPE.\n\
+- Arbitrary memory size, via compile-time macro MEMSIZE.\n\
+- Exclamation mark input in run mode.\n\
+- An extended/optimized instruction set (see README for specification.)\n", argv[0], argv[0], argv[0], argv[0]);
 		return EXIT_SUCCESS;
 	}
 	if (argc is 2)
