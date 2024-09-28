@@ -163,8 +163,19 @@ int
 minify_file(FILE *infile, FILE *outfile)
 {
 	char str[10000];
-	while (fgets(str, 10000, infile))
-		fputs(replace_pattern(str, minification), outfile);
+	char *exclamation = NULL;
+	while (fgets(str, 10000, infile)) {
+		if (exclamation) {
+			fputs(str, outfile);
+		} else if ((exclamation = strchr(str, '!'))) {
+			*exclamation = '\0';
+			fputs(replace_pattern(str, minification), outfile);
+			fputc('!', outfile);
+			fputs(exclamation+1, outfile);
+		} else {
+			fputs(replace_pattern(str, minification), outfile);
+		}
+	}
 	return EXIT_SUCCESS;
 }
 
