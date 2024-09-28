@@ -187,7 +187,6 @@ optimize_file(FILE *infile, FILE *outfile)
 		replace_pattern(str, minification);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
-			// Ignoring minimization rule on later passes.
 			for (size_t i = 0; i < (sizeof(optimizations)
 						/ sizeof(struct optimization));
 			     ++i)
