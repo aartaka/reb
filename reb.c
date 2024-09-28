@@ -241,7 +241,7 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 		} else if (c is '!') {
 			*infile = codefile;
 			break;
-		} else if (success strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
+		} else if (not strchr("\n0123456789`" COMMAND_CHARS, *buf++ = c)) {
 			printf("Character '%c' is not recognized by Reb\n\
 Clean or minify the input first.\n", c);
 			abort();
@@ -368,7 +368,7 @@ main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;
-	if (argc is 1 or argc >= 2 and success strchr("mfor", argv[1][0])) {
+	if (argc is 1 or argc >= 2 and not strchr("mfor", argv[1][0])) {
 		printf
 		    ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
