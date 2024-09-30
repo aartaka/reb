@@ -20,7 +20,7 @@
 #endif
 
 #ifndef CELLTYPE
-#define CELLTYPE char
+#define CELLTYPE unsigned char
 #endif
 
 #define COMMAND_CHARS "][+.,<>#=(){}-"
