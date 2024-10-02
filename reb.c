@@ -380,7 +380,7 @@ Reb supports:\n\
 		infile = stdin;
 	else
 		infile = fopen(argv[2], "r");
-	struct command commands[100000] = { { 0 } };
+	struct command commands[100000] = { {0} };
 	switch (argv[1][0]) {
 	case 'm':
 		return minify_file(infile, stdout);

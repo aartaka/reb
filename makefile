@@ -3,7 +3,7 @@
 all: reb
 
 indent: reb.c
-	-indent --k-and-r-style --indent-level8 --tab-size8 $^
+	-indent -linux $^
 
 clean:
 	-rm reb
