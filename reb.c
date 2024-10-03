@@ -127,12 +127,14 @@ struct optimization {
         regex_t regvar;                         \
         regmatch_t matchvar[10];                \
         regcomp(&regvar, __VA_ARGS__, 0);
-bool regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
+bool
+regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
 	return success regexec(preg, str, 10, pmatch, 0);
 }
 
-char *replace_pattern(char *str, struct optimization opt)
+char *
+replace_pattern(char *str, struct optimization opt)
 {
 	withreg(reg, rmatch, opt.pattern);
 	char copy[10000];
@@ -157,7 +159,8 @@ char *replace_pattern(char *str, struct optimization opt)
 	return str;
 }
 
-int minify_file(FILE *infile, FILE *outfile)
+int
+minify_file(FILE *infile, FILE *outfile)
 {
 	char str[10000];
 	while (fgets(str, 10000, infile))
@@ -165,7 +168,8 @@ int minify_file(FILE *infile, FILE *outfile)
 	return EXIT_SUCCESS;
 }
 
-int optimize_file(FILE *infile, FILE *outfile)
+int
+optimize_file(FILE *infile, FILE *outfile)
 {
 	char str[10000];
 	while (fgets(str, 10000, infile)) {
@@ -181,7 +185,8 @@ int optimize_file(FILE *infile, FILE *outfile)
 	return EXIT_SUCCESS;
 }
 
-int format_file(FILE *infile, FILE *outfile)
+int
+format_file(FILE *infile, FILE *outfile)
 {
 	withreg(blank_reg, blank_matches, "^[[:space:]]*$");
 	withreg(normal_reg, normal_matches, "^[[:space:]]*\\(.*\\)$");
@@ -216,12 +221,14 @@ struct command {
 	char command;
 };
 
-bool regpresent(regmatch_t *pmatch)
+bool
+regpresent(regmatch_t *pmatch)
 {
 	return pmatch->rm_so != pmatch->rm_eo;
 }
 
-void parse_file(FILE *codefile, struct command *commands, FILE **infile)
+void
+parse_file(FILE *codefile, struct command *commands, FILE **infile)
 {
 	withreg(reg, rmatches, OP_REGEX);
 	struct command current = { 1, 1 };
@@ -232,8 +239,7 @@ void parse_file(FILE *codefile, struct command *commands, FILE **infile)
 		} else if (c is '!') {
 			*infile = codefile;
 			break;
-		} else if (not
-			   strchr("\n0123456789`" COMMAND_CHARS, c)) {
+		} else if (not strchr("\n0123456789`" COMMAND_CHARS, c)) {
 			printf("Character '%c' is not recognized by Reb\n\
 Clean or minify the input first.\n", c);
 			abort();
@@ -265,7 +271,8 @@ CELLTYPE memory_[MEMSIZE] = { 0 };
 
 CELLTYPE *memory = &memory_[MEMSIZE / 2];
 
-int eval_commands(struct command *commands, FILE *infile, FILE *outfile)
+int
+eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 {
 	int depth = 0;
 	for (size_t i = 0; commands[i].command; ++i) {
@@ -355,7 +362,8 @@ int eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 	return EXIT_SUCCESS;
 }
 
-int main(int argc, char *argv[argc])
+int
+main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;

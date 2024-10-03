@@ -3,7 +3,7 @@
 all: reb
 
 indent: reb.c
-	-indent -linux $^
+	-indent -linux --procnames-start-lines $^
 
 clean:
 	-rm reb
