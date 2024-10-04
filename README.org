@@ -3,6 +3,7 @@
 Reb is a CLI tool for working with Brainfuck. Right now, it supports:
 - Code minification and formatting.
 - Pattern optimization.
+- Compilation to C.
 - And evaluation of both Brainfuck and optimized code format.
 
 The catch is: it's all regex.
@@ -34,6 +35,7 @@ There are four main commands in Reb:
 - f :: formatting (as per [[https://github.com/bf-enterprise-solutions/bf.style][bf.style]].)
 - o :: optimization.
 - r :: evaluation (from "run").
+- c :: compilation to C.
 
 Either of these is invoked as a prefix following the executable name.
 I.e., minifying =file.bf= into =file.min.bf= is:

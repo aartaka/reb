@@ -363,11 +363,73 @@ eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 }
 
 int
+compile_commands(struct command *commands, FILE *outfile)
+{
+	fprintf(outfile, "#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n");
+	fprintf(outfile, "char memory_[%i] = {0};\n", MEMSIZE);
+	fprintf(outfile, "int main (void)\n{\n");
+	fprintf(outfile, "\tchar *memory = &memory_[%i/2];\n", MEMSIZE);
+	fprintf(outfile, "\tchar c;\n");
+	for (size_t i = 0; commands[i].command; ++i) {
+		struct command command = commands[i];
+		switch (command.command) {
+		case '+':
+			fprintf(outfile, "\t*memory += %i;\n", command.argument);
+			break;
+		case '-':
+			fprintf(outfile, "\t*memory -= %i;\n", command.argument);
+			break;
+		case '>':
+			fprintf(outfile, "\tmemory += %i;\n", command.argument);
+			memory += command.argument;
+			break;
+		case '<':
+			fprintf(outfile, "\tmemory -= %i;\n", command.argument);
+			break;
+		case ',':
+			fprintf(outfile, "\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
+			break;
+		case '.':
+			fprintf(outfile, "\tputchar(*memory);\n");
+			break;
+		case '[':
+			fprintf(outfile, "\twhile(*memory) {\n");
+			break;
+		case ']':
+			fprintf(outfile, "\t}\n");
+			break;
+		case '=':
+			fprintf(outfile, "\t*memory = %i;\n", command.argument);
+			break;
+		case '}':
+			fprintf(outfile, "\tmemory[%i] = *memory * %i;\n\
+\t*memory = 0;\n", command.offset, command.argument);
+			break;
+		case '{':
+			fprintf(outfile, "\tmemory[-%i] = *memory * %i;\n\
+\t*memory = 0;\n", command.offset, command.argument);
+			break;
+		case ')':
+			fprintf(outfile, "\tfor(; *memory != %i; memory += %i);\n\
+\t*memory = 0;\n", command.argument, command.offset);
+			break;
+		case '(':
+			fprintf(outfile, "\tfor(; *memory != %i; memory -= %i);\n\
+\t*memory = 0;\n", command.argument, command.offset);
+			*memory = 0;
+			break;
+		}
+	}
+	fprintf(outfile, "\treturn EXIT_SUCCESS;\n}\n");
+	return EXIT_SUCCESS;
+}
+
+int
 main(int argc, char *argv[argc])
 {
 	FILE *infile;
 	FILE *bfin = stdin;
-	if (argc is 1 or argc >= 2 and not strchr("mfor", argv[1][0])) {
+	if (argc is 1 or argc >= 2 and not strchr("mforc", argv[1][0])) {
 		printf
 		    ("Reb is a Brainfuck toolkit using regex for everything.\n\
 Available commands:\n\
@@ -375,12 +437,13 @@ Available commands:\n\
 %s\tm[inify]   FILE/--\tMinify the FILE and output the result.\n\
 %s\to[ptimize] FILE/--\tOutput more efficient Reb format for FILE.\n\
 %s\tr[un]      FILE/--\tRun the (minified or optimized) contents of the FILE.\n\
+%s\tc[ompile]  FILE/--\tCompile the (minified or optimized) contents of the FILE to C.\n\
 \n\
 Reb supports:\n\
 - Arbitrary precision cells, via compile-time macro CELLTYPE.\n\
 - Arbitrary memory size, via compile-time macro MEMSIZE.\n\
 - Exclamation mark input in run mode.\n\
-- An extended/optimized instruction set (see README for specification.)\n", argv[0], argv[0], argv[0], argv[0]);
+- An extended/optimized instruction set (see README for specification.)\n", argv[0], argv[0], argv[0], argv[0], argv[0]);
 		return EXIT_SUCCESS;
 	}
 	if (argc is 2)
@@ -403,6 +466,9 @@ Reb supports:\n\
 		/*         printf("Command %c on %d over %d\n", */
 		/*                commands[i].command, commands[i].argument, commands[i].offset); */
 		return eval_commands(commands, bfin, stdout);
+	case 'c':
+		parse_file(infile, commands, &bfin);
+		return compile_commands(commands, stdout);
 	}
 	return EXIT_SUCCESS;
 }
