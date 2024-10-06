@@ -319,13 +319,11 @@ eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 			*memory = command.argument;
 			break;
 		case '}':
-			*(memory + command.offset) +=
-			    *memory * command.argument;
+			memory[command.offset] += *memory * command.argument;
 			*memory = 0;
 			break;
 		case '{':
-			*(memory - command.offset) +=
-			    *memory * command.argument;
+			memory[-command.offset] += *memory * command.argument;
 			*memory = 0;
 			break;
 		case ')':
