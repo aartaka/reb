@@ -272,7 +272,7 @@ CELLTYPE memory_[MEMSIZE] = { 0 };
 CELLTYPE *memory = &memory_[MEMSIZE / 2];
 
 int
-eval_commands(struct command *commands, FILE *infile, FILE *outfile)
+run_commands(struct command *commands, FILE *infile, FILE *outfile)
 {
 	int depth = 0;
 	for (size_t i = 0; commands[i].command; ++i) {
@@ -468,7 +468,7 @@ Reb supports:\n\
 		/* for (int i = 0; commands[i].command; ++i) */
 		/*         printf("Command %c on %d over %d\n", */
 		/*                commands[i].command, commands[i].argument, commands[i].offset); */
-		return eval_commands(commands, bfin, stdout);
+		return run_commands(commands, bfin, stdout);
 	case 'c':
 		parse_file(infile, commands, &bfin);
 		return compile_commands(commands, stdout);
