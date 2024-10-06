@@ -363,7 +363,8 @@ eval_commands(struct command *commands, FILE *infile, FILE *outfile)
 int
 compile_commands(struct command *commands, FILE *outfile)
 {
-	fprintf(outfile, "#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n");
+	fprintf(outfile,
+		"#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n");
 	fprintf(outfile, "char memory_[%i] = {0};\n", MEMSIZE);
 	fprintf(outfile, "int main (void)\n{\n");
 	fprintf(outfile, "\tchar *memory = &memory_[%i/2];\n", MEMSIZE);
@@ -372,10 +373,12 @@ compile_commands(struct command *commands, FILE *outfile)
 		struct command command = commands[i];
 		switch (command.command) {
 		case '+':
-			fprintf(outfile, "\t*memory += %i;\n", command.argument);
+			fprintf(outfile, "\t*memory += %i;\n",
+				command.argument);
 			break;
 		case '-':
-			fprintf(outfile, "\t*memory -= %i;\n", command.argument);
+			fprintf(outfile, "\t*memory -= %i;\n",
+				command.argument);
 			break;
 		case '>':
 			fprintf(outfile, "\tmemory += %i;\n", command.argument);
@@ -385,7 +388,8 @@ compile_commands(struct command *commands, FILE *outfile)
 			fprintf(outfile, "\tmemory -= %i;\n", command.argument);
 			break;
 		case ',':
-			fprintf(outfile, "\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
+			fprintf(outfile,
+				"\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
 			break;
 		case '.':
 			fprintf(outfile, "\tputchar(*memory);\n");
@@ -400,21 +404,22 @@ compile_commands(struct command *commands, FILE *outfile)
 			fprintf(outfile, "\t*memory = %i;\n", command.argument);
 			break;
 		case '}':
-			fprintf(outfile, "\tmemory[%i] += *memory * %i;\n\
+			fprintf(outfile, "\tmemory[%u] += *memory * %u;\n\
 \t*memory = 0;\n", command.offset, command.argument);
 			break;
 		case '{':
-			fprintf(outfile, "\tmemory[-%i] += *memory * %i;\n\
+			fprintf(outfile, "\tmemory[-%u] += *memory * %u;\n\
 \t*memory = 0;\n", command.offset, command.argument);
 			break;
 		case ')':
-			fprintf(outfile, "\tfor(; *memory != %i; memory += %i);\n\
-\t*memory = 0;\n", command.argument, command.offset);
+			fprintf(outfile, "\tfor(; *memory != %u; memory += %u);\n\
+\t*memory = 0;\n", command.argument,
+				command.offset);
 			break;
 		case '(':
-			fprintf(outfile, "\tfor(; *memory != %i; memory -= %i);\n\
-\t*memory = 0;\n", command.argument, command.offset);
-			*memory = 0;
+			fprintf(outfile, "\tfor(; *memory != %u; memory -= %u);\n\
+\t*memory = 0;\n", command.argument,
+				command.offset);
 			break;
 		}
 	}
