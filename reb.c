@@ -400,11 +400,11 @@ compile_commands(struct command *commands, FILE *outfile)
 			fprintf(outfile, "\t*memory = %i;\n", command.argument);
 			break;
 		case '}':
-			fprintf(outfile, "\tmemory[%i] = *memory * %i;\n\
+			fprintf(outfile, "\tmemory[%i] += *memory * %i;\n\
 \t*memory = 0;\n", command.offset, command.argument);
 			break;
 		case '{':
-			fprintf(outfile, "\tmemory[-%i] = *memory * %i;\n\
+			fprintf(outfile, "\tmemory[-%i] += *memory * %i;\n\
 \t*memory = 0;\n", command.offset, command.argument);
 			break;
 		case ')':
