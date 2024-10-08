@@ -29,7 +29,7 @@
         "\\([0-9]*\\)\\(`\\{0,1\\}\\)\\([0-9]*\\)\\([" COMMAND_CHARS "]\\)"
 
 // *INDENT-OFF*
-struct optimization {
+struct replacement {
 	char *pattern;
 	char *replacement;
 } optimizations[] = {
@@ -135,23 +135,23 @@ regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 }
 
 char *
-replace_pattern(char *str, struct optimization opt)
+replace_pattern(char *str, struct replacement re)
 {
-	withreg(reg, rmatch, opt.pattern);
+	withreg(reg, rmatch, re.pattern);
 	char copy[10000];
 	strcpy(copy, str);
 	while (regmatch(&reg, str, rmatch)) {
 		int offset = rmatch[0].rm_so;
-		for (size_t i = 0; opt.replacement[i]; ++i) {
+		for (size_t i = 0; re.replacement[i]; ++i) {
 			// NOTE: Used to be < 32. 10-31 are undefined.
-			if (opt.replacement[i] is '\\' and isdigit(opt.replacement[i+1])) {
-				regmatch_t match = rmatch[opt.replacement[i+1]-48];
+			if (re.replacement[i] is '\\' and isdigit(re.replacement[i+1])) {
+				regmatch_t match = rmatch[re.replacement[i+1]-48];
 				memmove(str + offset, &copy[match.rm_so],
 					match.rm_eo - match.rm_so);
 				offset += match.rm_eo - match.rm_so;
 				i++;
 			} else {
-				str[offset++] = opt.replacement[i];
+				str[offset++] = re.replacement[i];
 			}
 		}
 		strcpy(str + offset, copy + rmatch[0].rm_eo);
@@ -178,7 +178,7 @@ optimize_file(FILE *infile, FILE *outfile)
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
 			for (size_t i = 0; i < (sizeof(optimizations)
-						/ sizeof(struct optimization));
+						/ sizeof(struct replacement));
 			     ++i)
 				replace_pattern(str, optimizations[i]);
 		fputs(str, outfile);
