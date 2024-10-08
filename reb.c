@@ -363,6 +363,23 @@ run_commands(struct command *commands, FILE *infile, FILE *outfile)
 	return EXIT_SUCCESS;
 }
 
+// *INDENT-OFF*
+/* struct replacement compilation[] = { */
+/* 	{"\\([0-9]*\\)=",              "\t*memory = \\1;\n"}, */
+/* 	{"\\([0-9]*\\)\\([+-]\\)",     "\t*memory \\2= \\1;\n"}, */
+/* 	{"\\([0-9]*\\)>",              "\tmemory += \\1;\n"}, */
+/* 	{"\\([0-9]*\\)<",              "\tmemory -= \\1;\n"}, */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\))", "\tfor(; *memory != \\2; memory += \\1);\n\t*memory = 0;\n"}, */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\)(", "\tfor(; *memory != \\2; memory -= \\1);\n\t*memory = 0;\n"}, */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\)}", "\tmemory+\\1 += *memory * \\2;\n\t*memory = 0;\n"}, */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\){", "\tmemory-\\1 += *memory * \\2;\n\t*memory = 0;\n"}, */
+/* 	{"[",                          "\twhile(*memory) {\n"}, */
+/* 	{"]",                          "\t}\n"}, */
+/* 	{",",                          "\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n"}, */
+/* 	{".",                          "\tputchar(*memory);\n"}, */
+/* }; */
+// *INDENT-ON*
+
 int
 compile_commands(struct command *commands, FILE *outfile)
 {
