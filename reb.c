@@ -146,7 +146,6 @@ replace_pattern(char *str, struct replacement re)
 	while (regmatch(&reg, str, rmatch)) {
 		int offset = rmatch[0].rm_so;
 		for (size_t i = 0; re.replacement[i]; ++i) {
-			// NOTE: Used to be < 32. 10-31 are undefined.
 			if (re.replacement[i] is '\\'
 			    and isdigit(re.replacement[i + 1])) {
 				regmatch_t match =
