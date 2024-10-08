@@ -141,32 +141,28 @@ char *
 replace_pattern(char *str, struct replacement re)
 {
 	withreg(reg, rmatch, re.pattern);
-	char *orig = str;
-	char buf_[10000];
-	char *buf = buf_;
+	char copy[10000];
+	strcpy(copy, str);
 	while (regmatch(&reg, str, rmatch)) {
-		memcpy(buf, str, rmatch[0].rm_so);
-		buf += rmatch[0].rm_so;
+		int offset = rmatch[0].rm_so;
 		for (size_t i = 0; re.replacement[i]; ++i) {
 			// NOTE: Used to be < 32. 10-31 are undefined.
 			if (re.replacement[i] is '\\'
 			    and isdigit(re.replacement[i + 1])) {
 				regmatch_t match =
-				    rmatch[re.replacement[i + 1] - '0'];
-				size_t len = match.rm_eo - match.rm_so;
-				memcpy(buf, &str[match.rm_so], len);
-				buf += len;
+				    rmatch[re.replacement[i + 1] - 48];
+				memmove(str + offset, &copy[match.rm_so],
+					match.rm_eo - match.rm_so);
+				offset += match.rm_eo - match.rm_so;
 				i++;
 			} else {
-				*buf = re.replacement[i];
-				++buf;
+				str[offset++] = re.replacement[i];
 			}
 		}
-		str += rmatch[0].rm_eo;
+		strcpy(str + offset, copy + rmatch[0].rm_eo);
+		strcpy(copy, str);
 	}
-	strcpy(buf, str);
-	strcpy(orig, buf_);
-	return orig;
+	return str;
 }
 
 int
