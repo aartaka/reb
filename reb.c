@@ -16,6 +16,9 @@
 #define is ==
 #define success 0 ==
 
+#define len(...) \
+	sizeof(__VA_ARGS__) / sizeof(__VA_ARGS__[0])
+
 #ifndef MEMSIZE
 #define MEMSIZE 100000
 #endif
@@ -179,9 +182,7 @@ optimize_file(FILE *infile, FILE *outfile)
 		replace_pattern(str, minification);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
-			for (size_t i = 0; i < (sizeof(optimizations)
-						/ sizeof(struct replacement));
-			     ++i)
+			for (size_t i = 0; i < len(optimizations); ++i)
 				replace_pattern(str, optimizations[i]);
 		fputs(str, outfile);
 	}
