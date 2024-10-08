@@ -144,8 +144,10 @@ replace_pattern(char *str, struct replacement re)
 		int offset = rmatch[0].rm_so;
 		for (size_t i = 0; re.replacement[i]; ++i) {
 			// NOTE: Used to be < 32. 10-31 are undefined.
-			if (re.replacement[i] is '\\' and isdigit(re.replacement[i+1])) {
-				regmatch_t match = rmatch[re.replacement[i+1]-48];
+			if (re.replacement[i] is '\\'
+			    and isdigit(re.replacement[i + 1])) {
+				regmatch_t match =
+				    rmatch[re.replacement[i + 1] - 48];
 				memmove(str + offset, &copy[match.rm_so],
 					match.rm_eo - match.rm_so);
 				offset += match.rm_eo - match.rm_so;
