@@ -405,7 +405,8 @@ compile_commands(struct command *commands, FILE *outfile)
 		case '<':
 			FPRBRK("\tmemory -= %i;\n", command.argument);
 		case ',':
-			FPRBRK("\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
+			FPRBRK
+			    ("\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
 		case '.':
 			FPRBRK("\tputchar(*memory);\n");
 		case '[':
