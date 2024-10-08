@@ -396,54 +396,37 @@ compile_commands(struct command *commands, FILE *outfile)
 		struct command command = commands[i];
 		switch (command.command) {
 		case '+':
-			fprintf(outfile, "\t*memory += %i;\n",
-				command.argument);
-			break;
+#define FPRBRK(...) fprintf(outfile, __VA_ARGS__); break;
+			FPRBRK("\t*memory += %i;\n", command.argument);
 		case '-':
-			fprintf(outfile, "\t*memory -= %i;\n",
-				command.argument);
-			break;
+			FPRBRK("\t*memory -= %i;\n", command.argument);
 		case '>':
-			fprintf(outfile, "\tmemory += %i;\n", command.argument);
-			memory += command.argument;
-			break;
+			FPRBRK("\tmemory += %i;\n", command.argument);
 		case '<':
-			fprintf(outfile, "\tmemory -= %i;\n", command.argument);
-			break;
+			FPRBRK("\tmemory -= %i;\n", command.argument);
 		case ',':
-			fprintf(outfile,
-				"\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
-			break;
+			FPRBRK("\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
 		case '.':
-			fprintf(outfile, "\tputchar(*memory);\n");
-			break;
+			FPRBRK("\tputchar(*memory);\n");
 		case '[':
-			fprintf(outfile, "\twhile(*memory) {\n");
-			break;
+			FPRBRK("\twhile(*memory) {\n");
 		case ']':
-			fprintf(outfile, "\t}\n");
-			break;
+			FPRBRK("\t}\n");
 		case '=':
-			fprintf(outfile, "\t*memory = %i;\n", command.argument);
-			break;
+			FPRBRK("\t*memory = %i;\n", command.argument);
 		case '}':
-			fprintf(outfile, "\tmemory[%u] += *memory * %u;\n\
+			FPRBRK("\tmemory[%u] += *memory * %u;\n\
 \t*memory = 0;\n", command.offset, command.argument);
-			break;
 		case '{':
-			fprintf(outfile, "\tmemory[-%u] += *memory * %u;\n\
+			FPRBRK("\tmemory[-%u] += *memory * %u;\n\
 \t*memory = 0;\n", command.offset, command.argument);
-			break;
 		case ')':
-			fprintf(outfile, "\tfor(; *memory != %u; memory += %u);\n\
-\t*memory = 0;\n", command.argument,
-				command.offset);
-			break;
+			FPRBRK("\tfor(; *memory != %u; memory += %u);\n\
+\t*memory = 0;\n", command.argument, command.offset);
 		case '(':
-			fprintf(outfile, "\tfor(; *memory != %u; memory -= %u);\n\
-\t*memory = 0;\n", command.argument,
-				command.offset);
-			break;
+			FPRBRK("\tfor(; *memory != %u; memory -= %u);\n\
+\t*memory = 0;\n", command.argument, command.offset)
+#undef FPRBRK
 		}
 	}
 	fprintf(outfile, "\treturn EXIT_SUCCESS;\n}\n");
