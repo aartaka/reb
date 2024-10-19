@@ -141,9 +141,6 @@ regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 	return success regexec(preg, str, 10, pmatch, 0);
 }
 
-// FIXME: only works for replacements <= than original text.  See
-// 6119165819432f05dd31c5b9b0b57c1552591e93 for an alternative, but
-// broken take.
 char *
 replace_pattern(char *str, struct replacement re)
 {
