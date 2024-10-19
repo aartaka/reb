@@ -151,25 +151,25 @@ replace_pattern(char *str, struct replacement re)
 	withreg(reg, rmatch, re.pattern);
 	char buf_[BUFSIZE] = {0};
 	char *buf = buf_;
-	while (regmatch(&reg, str, rmatch)) {
+	char *str_tmp = str;
+	while (regmatch(&reg, str_tmp, rmatch)) {
 		for (int i = 0; i < rmatch[0].rm_so; ++i)
-			*buf++ = str[i];
+			*buf++ = str_tmp[i];
 		for (int i = 0; re.replacement[i]; ++i) {
 			if (re.replacement[i] is '\\') {
-				regmatch_t match = rmatch[re.replacement[i+1] - '0'];
+				regmatch_t match = rmatch[re.replacement[i + 1] - '0'];
 				regoff_t size = match.rm_eo - match.rm_so;
-				memcpy(buf, str + match.rm_so, size);
+				memcpy(buf, str_tmp + match.rm_so, size);
 				buf += size;
 				i++; // skip the index char
 			} else {
 				*buf++ = re.replacement[i];
 			}
 		}
-		strcpy(buf, str + rmatch[0].rm_eo);
-		strcpy(str, buf_);
-		memset(buf_, '\0', len(buf_));
-		buf = buf_;
+		str_tmp += rmatch[0].rm_eo;
 	}
+	strcpy(buf, str_tmp);
+	strcpy(str, buf_);
 	return str;
 }
 
