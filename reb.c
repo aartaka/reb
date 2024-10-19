@@ -148,7 +148,7 @@ char *
 replace_pattern(char *str, struct replacement re)
 {
 	withreg(reg, rmatch, re.pattern);
-	char buf_[BUFSIZE] = {0};
+	char buf_[BUFSIZE] = { 0 };
 	char *buf = buf_;
 	char *str_tmp = str;
 	while (regmatch(&reg, str_tmp, rmatch)) {
@@ -156,11 +156,12 @@ replace_pattern(char *str, struct replacement re)
 			*buf++ = str_tmp[i];
 		for (int i = 0; re.replacement[i]; ++i) {
 			if (re.replacement[i] is '\\') {
-				regmatch_t match = rmatch[re.replacement[i + 1] - '0'];
+				regmatch_t match =
+				    rmatch[re.replacement[i + 1] - '0'];
 				regoff_t size = match.rm_eo - match.rm_so;
 				memcpy(buf, str_tmp + match.rm_so, size);
 				buf += size;
-				i++; // skip the index char
+				i++;	// skip the index char
 			} else {
 				*buf++ = re.replacement[i];
 			}
@@ -175,7 +176,7 @@ replace_pattern(char *str, struct replacement re)
 int
 minify_file(FILE *infile, FILE *outfile)
 {
-	char str[BUFSIZE] = {0};
+	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile))
 		fputs(replace_pattern(str, minification), outfile);
 	return EXIT_SUCCESS;
@@ -184,7 +185,7 @@ minify_file(FILE *infile, FILE *outfile)
 int
 optimize_file(FILE *infile, FILE *outfile)
 {
-	char str[BUFSIZE] = {0};
+	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile)) {
 		replace_pattern(str, minification);
 		// Repeat multiple times to make sure everything is optimized.
@@ -201,7 +202,7 @@ format_file(FILE *infile, FILE *outfile)
 {
 	withreg(blank_reg, blank_matches, "^[[:space:]]*$");
 	withreg(normal_reg, normal_matches, "^[[:space:]]*\\(.*\\)$");
-	char str[BUFSIZE] = {0};
+	char str[BUFSIZE] = { 0 };
 	int depth = 0;
 	while (fgets(str, BUFSIZE, infile)) {
 		if (regmatch(&blank_reg, str, blank_matches)) {
@@ -243,7 +244,7 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 {
 	withreg(reg, rmatches, OP_REGEX);
 	struct command current = { 1, 1 };
-	char c, str[BUFSIZE] = {0}, *buf = str;
+	char c, str[BUFSIZE] = { 0 }, *buf = str;
 	while (EOF != (c = fgetc(codefile))) {
 		if (c is '\r') {
 			continue;
