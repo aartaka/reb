@@ -19,6 +19,11 @@
 #define len(...) \
 	sizeof(__VA_ARGS__) / sizeof(__VA_ARGS__[0])
 
+// I know there's BUFSIZ, but it's too small.
+#ifndef BUFSIZE
+#define BUFSIZE 1000000
+#endif
+
 #ifndef MEMSIZE
 #define MEMSIZE 100000
 #endif
@@ -144,25 +149,26 @@ char *
 replace_pattern(char *str, struct replacement re)
 {
 	withreg(reg, rmatch, re.pattern);
-	char copy[10000];
-	strcpy(copy, str);
+	char buf_[BUFSIZE] = {0};
+	char *buf = buf_;
 	while (regmatch(&reg, str, rmatch)) {
-		int offset = rmatch[0].rm_so;
-		for (size_t i = 0; re.replacement[i]; ++i) {
-			if (re.replacement[i] is '\\'
-			    and isdigit(re.replacement[i + 1])) {
-				regmatch_t match =
-				    rmatch[re.replacement[i + 1] - 48];
-				memmove(str + offset, &copy[match.rm_so],
-					match.rm_eo - match.rm_so);
-				offset += match.rm_eo - match.rm_so;
-				i++;
+		for (int i = 0; i < rmatch[0].rm_so; ++i)
+			*buf++ = str[i];
+		for (int i = 0; re.replacement[i]; ++i) {
+			if (re.replacement[i] is '\\') {
+				regmatch_t match = rmatch[re.replacement[i+1] - '0'];
+				regoff_t size = match.rm_eo - match.rm_so;
+				memcpy(buf, str + match.rm_so, size);
+				buf += size;
+				i++; // skip the index char
 			} else {
-				str[offset++] = re.replacement[i];
+				*buf++ = re.replacement[i];
 			}
 		}
-		strcpy(str + offset, copy + rmatch[0].rm_eo);
-		strcpy(copy, str);
+		strcpy(buf, str + rmatch[0].rm_eo);
+		strcpy(str, buf_);
+		memset(buf_, '\0', len(buf_));
+		buf = buf_;
 	}
 	return str;
 }
@@ -170,8 +176,8 @@ replace_pattern(char *str, struct replacement re)
 int
 minify_file(FILE *infile, FILE *outfile)
 {
-	char str[10000];
-	while (fgets(str, 10000, infile))
+	char str[BUFSIZE] = {0};
+	while (fgets(str, BUFSIZE, infile))
 		fputs(replace_pattern(str, minification), outfile);
 	return EXIT_SUCCESS;
 }
@@ -179,8 +185,8 @@ minify_file(FILE *infile, FILE *outfile)
 int
 optimize_file(FILE *infile, FILE *outfile)
 {
-	char str[10000];
-	while (fgets(str, 10000, infile)) {
+	char str[BUFSIZE] = {0};
+	while (fgets(str, BUFSIZE, infile)) {
 		replace_pattern(str, minification);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
@@ -196,9 +202,9 @@ format_file(FILE *infile, FILE *outfile)
 {
 	withreg(blank_reg, blank_matches, "^[[:space:]]*$");
 	withreg(normal_reg, normal_matches, "^[[:space:]]*\\(.*\\)$");
-	char str[10000];
+	char str[BUFSIZE] = {0};
 	int depth = 0;
-	while (fgets(str, 10000, infile)) {
+	while (fgets(str, BUFSIZE, infile)) {
 		if (regmatch(&blank_reg, str, blank_matches)) {
 			fputs("\n", outfile);
 		} else if (regmatch(&normal_reg, str, normal_matches)) {
@@ -238,7 +244,7 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 {
 	withreg(reg, rmatches, OP_REGEX);
 	struct command current = { 1, 1 };
-	char c, str[1000000], *buf = str;
+	char c, str[BUFSIZE] = {0}, *buf = str;
 	while (EOF != (c = fgetc(codefile))) {
 		if (c is '\r') {
 			continue;
