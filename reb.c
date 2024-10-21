@@ -141,41 +141,42 @@ regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 	return success regexec(preg, str, 10, pmatch, 0);
 }
 
-char *
-replace_pattern(char *str, struct replacement re)
+void
+regsubst(char *str, char *pattern, char *replacement)
 {
-	withreg(reg, rmatch, re.pattern);
+	withreg(reg, rmatch, pattern);
 	char buf_[BUFSIZE] = { 0 };
 	char *buf = buf_;
 	char *str_tmp = str;
 	while (regmatch(&reg, str_tmp, rmatch)) {
 		for (int i = 0; i < rmatch[0].rm_so; ++i)
 			*buf++ = str_tmp[i];
-		for (int i = 0; re.replacement[i]; ++i) {
-			if (re.replacement[i] is '\\') {
+		for (int i = 0; replacement[i]; ++i) {
+			if (replacement[i] is '\\') {
 				regmatch_t match =
-				    rmatch[re.replacement[i + 1] - '0'];
+				    rmatch[replacement[i + 1] - '0'];
 				regoff_t size = match.rm_eo - match.rm_so;
 				memcpy(buf, str_tmp + match.rm_so, size);
 				buf += size;
 				i++;	// skip the index char
 			} else {
-				*buf++ = re.replacement[i];
+				*buf++ = replacement[i];
 			}
 		}
 		str_tmp += rmatch[0].rm_eo;
 	}
 	strcpy(buf, str_tmp);
 	strcpy(str, buf_);
-	return str;
 }
 
 int
 minify_file(FILE *infile, FILE *outfile)
 {
 	char str[BUFSIZE] = { 0 };
-	while (fgets(str, BUFSIZE, infile))
-		fputs(replace_pattern(str, minification), outfile);
+	while (fgets(str, BUFSIZE, infile)) {
+		regsubst(str, minification.pattern, minification.replacement);
+		fputs(str, outfile);
+	}
 	return EXIT_SUCCESS;
 }
 
@@ -184,11 +185,11 @@ optimize_file(FILE *infile, FILE *outfile)
 {
 	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile)) {
-		replace_pattern(str, minification);
+		regsubst(str, minification.pattern, minification.replacement);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
 			for (size_t i = 0; i < len(optimizations); ++i)
-				replace_pattern(str, optimizations[i]);
+				regsubst(str, optimizations[i].pattern, optimizations[i].replacement);
 		fputs(str, outfile);
 	}
 	return EXIT_SUCCESS;
