@@ -135,13 +135,13 @@ struct replacement {
         regex_t regvar;                         \
         regmatch_t matchvar[10];                \
         regcomp(&regvar, __VA_ARGS__, 0);
-bool
+static bool
 regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
 	return success regexec(preg, str, 10, pmatch, 0);
 }
 
-void
+static void
 regsubst(char *str, char *pattern, char *replacement)
 {
 	withreg(reg, rmatch, pattern);
@@ -169,7 +169,7 @@ regsubst(char *str, char *pattern, char *replacement)
 	strcpy(str, buf_);
 }
 
-int
+static int
 minify_file(FILE *infile, FILE *outfile)
 {
 	char str[BUFSIZE] = { 0 };
@@ -180,7 +180,7 @@ minify_file(FILE *infile, FILE *outfile)
 	return EXIT_SUCCESS;
 }
 
-int
+static int
 optimize_file(FILE *infile, FILE *outfile)
 {
 	char str[BUFSIZE] = { 0 };
@@ -195,7 +195,7 @@ optimize_file(FILE *infile, FILE *outfile)
 	return EXIT_SUCCESS;
 }
 
-int
+static int
 format_file(FILE *infile, FILE *outfile)
 {
 	withreg(blank_reg, blank_matches, "^[[:space:]]*$");
@@ -231,13 +231,13 @@ struct command {
 	char command;
 };
 
-bool
+static bool
 regpresent(regmatch_t *pmatch)
 {
 	return pmatch->rm_so != pmatch->rm_eo;
 }
 
-void
+static void
 parse_file(FILE *codefile, struct command *commands, FILE **infile)
 {
 	withreg(reg, rmatches, OP_REGEX);
@@ -281,7 +281,7 @@ CELLTYPE memory_[MEMSIZE] = { 0 };
 
 CELLTYPE *memory = &memory_[MEMSIZE / 2];
 
-int
+static int
 run_commands(struct command *commands, FILE *infile, FILE *outfile)
 {
 	int depth = 0;
@@ -387,7 +387,7 @@ run_commands(struct command *commands, FILE *infile, FILE *outfile)
 /* }; */
 // *INDENT-ON*
 
-int
+static int
 compile_commands(struct command *commands, FILE *outfile)
 {
 	fprintf(outfile,
