@@ -374,69 +374,46 @@ run_commands(struct command *commands, FILE *infile, FILE *outfile)
 }
 
 // *INDENT-OFF*
-/* struct replacement compilation[] = { */
-/* 	{"\\([0-9]*\\)=",              "\t*memory = or1&l;\\1&r;;\n"}, */
-/* 	{"\\([0-9]*\\)\\([+-]\\)",     "\t*memory \\2= or1&l;\\1&r;;\n"}, */
-/* 	{",",                          "\tread&l;&r;;\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\))", "\tseek&l;or1&l;\\1&r;, or1&l;\\2&r;&r;;\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\)(", "\tseek&l;-or1&l;\\1&r;,or1&l;\\2&r;&r;;\n"}, */
-/* 	{"&l;",                        "("}, */
-/* 	{"&r;",                        ")"}, */
-/* 	{"\\([0-9]*\\)>",              "\tmemory += or1(\\1);\n"}, */
-/* 	{"\\([0-9]*\\)<",              "\tmemory -= or1(\\1);\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\)}", "\tcopy(or1(\\1), or1(\\2));\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\){", "\tcopy(-or1(\\1),or1(\\2));\n"}, */
-/* 	{"\\[",                        "\twhile(*memory) {\n"}, */
-/* 	{"\\]",                        "\t}\n"}, */
-/* 	{"\\.",                        "\tputchar(*memory);\n"}, */
-/* }; */
+struct replacement compilation[] = {
+	{"\\([0-9]*\\)=",              "\t*memory = or1&l;\\1&r;;\n"},
+	{"\\([0-9]*\\)\\([+-]\\)",     "\t*memory \\2= or1&l;\\1&r;;\n"},
+	{",",                          "\tread&l;&r;;\n"},
+	{"\\([0-9]*\\)`\\([0-9]*\\))", "\tseek&l;or1&l;\\1&r;, or1&l;\\2&r;&r;;\n"},
+	{"\\([0-9]*\\)`\\([0-9]*\\)(", "\tseek&l;-or1&l;\\1&r;,or1&l;\\2&r;&r;;\n"},
+	{"&l;",                        "("},
+	{"&r;",                        ")"},
+	{"\\([0-9]*\\)>",              "\tmemory += or1(\\1);\n"},
+	{"\\([0-9]*\\)<",              "\tmemory -= or1(\\1);\n"},
+	{"\\([0-9]*\\)`\\([0-9]*\\)}", "\tcopy(or1(\\1), or1(\\2));\n"},
+	{"\\([0-9]*\\)`\\([0-9]*\\){", "\tcopy(-or1(\\1),or1(\\2));\n"},
+	{"\\[",                        "\twhile(*memory) {\n"},
+	{"\\]",                        "\t}\n"},
+	{"\\.",                        "\tputchar(*memory);\n"},
+};
 // *INDENT-ON*
 
 static int
-compile_commands(struct command *commands, FILE *outfile)
+compile_file(FILE *infile, FILE *outfile)
 {
 	fprintf(outfile,
 		"#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n\n");
 	fprintf(outfile, "char memory_[%i] = {0};\n", MEMSIZE);
 	fprintf(outfile, "char *memory = &memory_[%i/2];\n\n", MEMSIZE);
-	fprintf(outfile, "static inline void read() { char c; if((c=getchar())!=EOF) *memory=c; else *memory = 0; }\n");
-	fprintf(outfile, "static inline void copy(int off, int mult) { memory[off] += *memory * mult; *memory = 0; }\n");
-	fprintf(outfile, "static inline void seek(int off, int val) { for(; *memory != val; memory += off); *memory = 0; }\n\n");
+	fprintf(outfile,
+		"static inline void read() { char c; if((c=getchar())!=EOF) *memory=c; else *memory = 0; }\n");
+	fprintf(outfile,
+		"static inline void copy(int off, int mult) { memory[off] += *memory * mult; *memory = 0; }\n");
+	fprintf(outfile,
+		"static inline void seek(int off, int val) { for(; *memory != val; memory += off); *memory = 0; }\n\n");
+	fprintf(outfile,
+		"#define or1(...) (int)(strlen(#__VA_ARGS__) ? __VA_ARGS__ : 1)\n");
 	fprintf(outfile, "int main (void)\n{\n");
-	for (size_t i = 0; commands[i].command; ++i) {
-		struct command command = commands[i];
-		switch (command.command) {
-		case '+':
-#define FPRBRK(...) fprintf(outfile, __VA_ARGS__); break;
-			FPRBRK("\t*memory += %i;\n", command.argument);
-		case '-':
-			FPRBRK("\t*memory -= %i;\n", command.argument);
-		case '>':
-			FPRBRK("\tmemory += %i;\n", command.argument);
-		case '<':
-			FPRBRK("\tmemory -= %i;\n", command.argument);
-		case ',':
-			FPRBRK("\tread();\n");
-		case '.':
-			FPRBRK("\tputchar(*memory);\n");
-		case '[':
-			FPRBRK("\twhile(*memory) {\n");
-		case ']':
-			FPRBRK("\t}\n");
-		case '=':
-			FPRBRK("\t*memory = %i;\n", command.argument);
-		case '}':
-			FPRBRK("\tcopy(%u, %u);",
-			       command.offset, command.argument);
-		case '{':
-			FPRBRK("\tcopy(-%u, %u);",
-			       command.offset, command.argument);
-		case ')':
-			FPRBRK("\tseek(%u, %u);", command.offset, command.argument);
-		case '(':
-			FPRBRK("\tseek(-%u, %u);", command.offset, command.argument);
-#undef FPRBRK
-		}
+	char str[BUFSIZE] = { 0 };
+	while (fgets(str, BUFSIZE, infile)) {
+		for (size_t i = 0; i < len(compilation); ++i)
+			regsubst(str, compilation[i].pattern,
+				 compilation[i].replacement);
+		fputs(str, outfile);
 	}
 	fprintf(outfile, "\treturn EXIT_SUCCESS;\n}\n");
 	return EXIT_SUCCESS;
@@ -485,8 +462,7 @@ Reb supports:\n\
 		/*                commands[i].command, commands[i].argument, commands[i].offset); */
 		return run_commands(commands, bfin, stdout);
 	case 'c':
-		parse_file(infile, commands, &bfin);
-		return compile_commands(commands, stdout);
+		return compile_file(infile, stdout);
 	}
 	return EXIT_SUCCESS;
 }
