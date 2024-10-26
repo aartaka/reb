@@ -244,16 +244,18 @@ parse_file(FILE *codefile, struct command *commands, FILE **infile)
 	withreg(reg, rmatches, OP_REGEX);
 	struct command current = { 1, 1 };
 	char c, str[BUFSIZE] = { 0 }, *buf = str;
+	bool warned_already = false;
 	while (EOF != (c = fgetc(codefile))) {
 		if (c is '\r') {
 			continue;
 		} else if (c is '!') {
 			*infile = codefile;
 			break;
-		} else if (not strchr("\n0123456789`" COMMAND_CHARS, c)) {
+		} else if (not strchr("\n0123456789`" COMMAND_CHARS, c)
+			   and not warned_already) {
 			printf("Character '%c' is not recognized by Reb\n\
-Clean or minify the input first.\n", c);
-			abort();
+Clean or minify the input first for reliable result.\n", c);
+			warned_already = true;
 		}
 		*buf++ = c;
 	}
