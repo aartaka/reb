@@ -394,14 +394,13 @@ static int
 compile_commands(struct command *commands, FILE *outfile)
 {
 	fprintf(outfile,
-		"#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n");
-	fprintf(outfile, "void read(char *mem) { char c; if((c=getchar())!=EOF) *mem=c; else *mem = 0; }\n");
-	fprintf(outfile, "void copy(char *mem, int off, int mult) { mem[off] += *mem * mult; *mem = 0; }\n");
-	fprintf(outfile, "void seek(char *mem, int off, int val) { for(; *mem != val; mem += off); *mem = 0; }\n");
+		"#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n\n");
 	fprintf(outfile, "char memory_[%i] = {0};\n", MEMSIZE);
+	fprintf(outfile, "char *memory = &memory_[%i/2];\n\n", MEMSIZE);
+	fprintf(outfile, "static inline void read() { char c; if((c=getchar())!=EOF) *memory=c; else *memory = 0; }\n");
+	fprintf(outfile, "static inline void copy(int off, int mult) { memory[off] += *memory * mult; *memory = 0; }\n");
+	fprintf(outfile, "static inline void seek(int off, int val) { for(; *memory != val; memory += off); *memory = 0; }\n\n");
 	fprintf(outfile, "int main (void)\n{\n");
-	fprintf(outfile, "\tchar *memory = &memory_[%i/2];\n", MEMSIZE);
-	fprintf(outfile, "\tchar c;\n");
 	for (size_t i = 0; commands[i].command; ++i) {
 		struct command command = commands[i];
 		switch (command.command) {
@@ -415,8 +414,7 @@ compile_commands(struct command *commands, FILE *outfile)
 		case '<':
 			FPRBRK("\tmemory -= %i;\n", command.argument);
 		case ',':
-			FPRBRK
-			    ("\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n");
+			FPRBRK("\tread();\n");
 		case '.':
 			FPRBRK("\tputchar(*memory);\n");
 		case '[':
@@ -426,17 +424,15 @@ compile_commands(struct command *commands, FILE *outfile)
 		case '=':
 			FPRBRK("\t*memory = %i;\n", command.argument);
 		case '}':
-			FPRBRK("\tmemory[%u] += *memory * %u;\n\
-\t*memory = 0;\n", command.offset, command.argument);
+			FPRBRK("\tcopy(%u, %u);",
+			       command.offset, command.argument);
 		case '{':
-			FPRBRK("\tmemory[-%u] += *memory * %u;\n\
-\t*memory = 0;\n", command.offset, command.argument);
+			FPRBRK("\tcopy(-%u, %u);",
+			       command.offset, command.argument);
 		case ')':
-			FPRBRK("\tfor(; *memory != %u; memory += %u);\n\
-\t*memory = 0;\n", command.argument, command.offset);
+			FPRBRK("\tseek(%u, %u);", command.offset, command.argument);
 		case '(':
-			FPRBRK("\tfor(; *memory != %u; memory -= %u);\n\
-\t*memory = 0;\n", command.argument, command.offset)
+			FPRBRK("\tseek(-%u, %u);", command.offset, command.argument);
 #undef FPRBRK
 		}
 	}
