@@ -189,7 +189,8 @@ optimize_file(FILE *infile, FILE *outfile)
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
 			for (size_t i = 0; i < len(optimizations); ++i)
-				regsubst(str, optimizations[i].pattern, optimizations[i].replacement);
+				regsubst(str, optimizations[i].pattern,
+					 optimizations[i].replacement);
 		fputs(str, outfile);
 	}
 	return EXIT_SUCCESS;
