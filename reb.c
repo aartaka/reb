@@ -395,6 +395,9 @@ compile_commands(struct command *commands, FILE *outfile)
 {
 	fprintf(outfile,
 		"#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n");
+	fprintf(outfile, "void read(char *mem) { char c; if((c=getchar())!=EOF) *mem=c; else *mem = 0; }\n");
+	fprintf(outfile, "void copy(char *mem, int off, int mult) { mem[off] += *mem * mult; *mem = 0; }\n");
+	fprintf(outfile, "void seek(char *mem, int off, int val) { for(; *mem != val; mem += off); *mem = 0; }\n");
 	fprintf(outfile, "char memory_[%i] = {0};\n", MEMSIZE);
 	fprintf(outfile, "int main (void)\n{\n");
 	fprintf(outfile, "\tchar *memory = &memory_[%i/2];\n", MEMSIZE);
