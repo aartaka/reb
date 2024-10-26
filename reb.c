@@ -377,17 +377,19 @@ run_commands(struct command *commands, FILE *infile, FILE *outfile)
 /* struct replacement compilation[] = { */
 /* 	{"\\([0-9]*\\)=",              "\t*memory = \\1;\n"}, */
 /* 	{"\\([0-9]*\\)\\([+-]\\)",     "\t*memory \\2= \\1;\n"}, */
+/* 	{",",                          "\tread&lpar;&rpar;;\n"}, */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\))", "\tseek&lpar;\\1, \\2&rpar;;\n"}, */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\)(", "\tseek&lpar;-\\1,\\2&rpar;;\n"}, */
+/* 	{"&lpar;",                     "("}, */
+/* 	{"&rpar;",                     ")"}, */
 /* 	{"\\([0-9]*\\)>",              "\tmemory += \\1;\n"}, */
 /* 	{"\\([0-9]*\\)<",              "\tmemory -= \\1;\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\))", "\tfor(; *memory != \\2; memory += \\1);\n\t*memory = 0;\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\)(", "\tfor(; *memory != \\2; memory -= \\1);\n\t*memory = 0;\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\)}", "\tmemory+\\1 += *memory * \\2;\n\t*memory = 0;\n"}, */
-/* 	{"\\([0-9]*\\)`\\([0-9]*\\){", "\tmemory-\\1 += *memory * \\2;\n\t*memory = 0;\n"}, */
-/* 	{"[",                          "\twhile(*memory) {\n"}, */
-/* 	{"]",                          "\t}\n"}, */
-/* 	{",",                          "\tif((c=getchar())!=EOF) *memory=c; else *memory = 0;\n"}, */
-/* 	{".",                          "\tputchar(*memory);\n"}, */
-/* }; */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\)}", "\tcopy(\\1, \\2);\n"}, */
+/* 	{"\\([0-9]*\\)`\\([0-9]*\\){", "\tcopy(-\\1,\\2);\n"}, */
+/* 	{"\\[",                        "\twhile(*memory) {\n"}, */
+/* 	{"\\]",                        "\t}\n"}, */
+/* 	{"\\.",                        "\tputchar(*memory);\n"}, */
+/* } */;
 // *INDENT-ON*
 
 static int
