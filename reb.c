@@ -131,10 +131,6 @@ struct replacement {
 }, minification = {"[^][+.,<>#-]", ""};
 // *INDENT-ON*
 
-#define withreg(regvar, matchvar, ...)          \
-        regex_t regvar;                         \
-        regmatch_t matchvar[10];                \
-        regcomp(&regvar, __VA_ARGS__, 0);
 static bool
 // Check whether PREG is matching STR and put matches in PMATCH if so.
 regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
@@ -154,7 +150,7 @@ regsubst(regex_t *preg, char *str, char *replacement, int times)
 	char buf_[BUFSIZE] = { 0 };
 	char *buf = buf_;
 	char *str_tmp = str;
-	while (regmatch(&preg, str_tmp, rmatch)
+	while (regmatch(preg, str_tmp, rmatch)
 	       // != 0 is to allow negative times and thus infinite
 	       // matching.
 	       and times != 0) {
@@ -182,10 +178,11 @@ regsubst(regex_t *preg, char *str, char *replacement, int times)
 static int
 minify_file(FILE *infile, FILE *outfile)
 {
-	withreg(reg, rmatch, minification.pattern);
+	regex_t minreg;
+	regcomp(&minreg, minification.pattern, 0);
 	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile)) {
-		regsubst(&reg, str, minification.replacement, -1);
+		regsubst(&minreg, str, minification.replacement, -1);
 		fputs(str, outfile);
 	}
 	return EXIT_SUCCESS;
@@ -194,14 +191,16 @@ minify_file(FILE *infile, FILE *outfile)
 static int
 optimize_file(FILE *infile, FILE *outfile)
 {
-	withreg(minreg, rmatch, minification.pattern);
+	regex_t minreg;
+	regcomp(&minreg, minification.pattern, 0);
 	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile)) {
 		regsubst(&minreg, str, minification.replacement, -1);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
 			for (size_t i = 0; i < len(optimizations); ++i) {
-				withreg(optreg, rmatches, optimizations[i].pattern);
+				regex_t optreg = {0};
+				regcomp(&optreg, optimizations[i].pattern, 0);
 				regsubst(&optreg, str, optimizations[i].replacement, -1);
 			}
 		fputs(str, outfile);
@@ -212,8 +211,10 @@ optimize_file(FILE *infile, FILE *outfile)
 static int
 format_file(FILE *infile, FILE *outfile)
 {
-	withreg(blank_reg, blank_matches, "^[[:space:]]*$");
-	withreg(normal_reg, normal_matches, "^[[:space:]]*\\(.*\\)$");
+	regex_t blank_reg, normal_reg;
+	regmatch_t blank_matches[10], normal_matches[10];
+	regcomp(&blank_reg, "^[[:space:]]*$", 0);
+	regcomp(&normal_reg, "^[[:space:]]*\\(.*\\)$", 0);
 	char str[BUFSIZE] = { 0 };
 	int depth = 0;
 	while (fgets(str, BUFSIZE, infile)) {
@@ -256,7 +257,9 @@ regpresent(regmatch_t *pmatch)
 static void
 parse_file(FILE *codefile, struct command *commands, FILE **infile)
 {
-	withreg(reg, rmatches, OP_REGEX);
+	regex_t opreg;
+	regmatch_t opmatches[10];
+	regcomp(&opreg, OP_REGEX, 0);
 	struct command current = { 1, 1 };
 	char c, str[BUFSIZE] = { 0 }, *buf = str;
 	bool warned_already = false;
@@ -275,23 +278,23 @@ Clean or minify the input first for reliable result.\n", c);
 		*buf++ = c;
 	}
 	buf = str;
-	while (regmatch(&reg, buf, rmatches)) {
-		bool tick = regpresent(&rmatches[2]);
-		if (tick and regpresent(&rmatches[3]))
-			current.argument = atoi(buf + rmatches[3].rm_so);
-		else if (not tick and regpresent(&rmatches[1]))
-			current.argument = atoi(buf + rmatches[1].rm_so);
+	while (regmatch(&opreg, buf, opmatches)) {
+		bool tick = regpresent(&opmatches[2]);
+		if (tick and regpresent(&opmatches[3]))
+			current.argument = atoi(buf + opmatches[3].rm_so);
+		else if (not tick and regpresent(&opmatches[1]))
+			current.argument = atoi(buf + opmatches[1].rm_so);
 		// Faulty: offset is there only if there is
 		// argument.
-		if (tick and regpresent(&rmatches[1]))
-			current.offset = atoi(buf + rmatches[1].rm_so);
-		current.command = buf[rmatches[4].rm_so];
+		if (tick and regpresent(&opmatches[1]))
+			current.offset = atoi(buf + opmatches[1].rm_so);
+		current.command = buf[opmatches[4].rm_so];
 		commands->argument = current.argument;
 		commands->command = current.command;
 		commands->offset = current.offset;
 		current.argument = current.offset = 1;
 		++commands;
-		buf += rmatches[4].rm_eo;
+		buf += opmatches[4].rm_eo;
 	}
 }
 
@@ -426,7 +429,8 @@ compile_file(FILE *infile, FILE *outfile)
 	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile)) {
 		for (size_t i = 0; i < len(compilation); ++i) {
-			withreg(compreg, rmatch, compilation[i].pattern);
+			regex_t compreg;
+			regcomp(&compreg, compilation[i].pattern, 0);
 			regsubst(&compreg, str, compilation[i].replacement, -1);
 		}
 		fputs(str, outfile);
