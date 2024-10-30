@@ -141,14 +141,22 @@ regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 	return success regexec(preg, str, 10, pmatch, 0);
 }
 
+// Replace all the instance of PATTERN in STR with REPLACEMENT.
+// REPLACEMENT can have backreferences that will be replaced with
+// PATTERN-matched groups in STR. In case TIMES is provided:
+// - If non-negative: only do TIMES replacements.
+// - If negative: do infinite replacements.
 static void
-regsubst(char *str, char *pattern, char *replacement)
+regsubst(char *str, char *pattern, char *replacement, int times)
 {
 	withreg(reg, rmatch, pattern);
 	char buf_[BUFSIZE] = { 0 };
 	char *buf = buf_;
 	char *str_tmp = str;
-	while (regmatch(&reg, str_tmp, rmatch)) {
+	while (regmatch(&reg, str_tmp, rmatch)
+	       // != 0 is to allow negative times and thus infinite
+	       // matching.
+	       and times != 0) {
 		for (int i = 0; i < rmatch[0].rm_so; ++i)
 			*buf++ = str_tmp[i];
 		for (int i = 0; replacement[i]; ++i) {
@@ -164,6 +172,7 @@ regsubst(char *str, char *pattern, char *replacement)
 			}
 		}
 		str_tmp += rmatch[0].rm_eo;
+		--times;
 	}
 	strcpy(buf, str_tmp);
 	strcpy(str, buf_);
@@ -174,7 +183,7 @@ minify_file(FILE *infile, FILE *outfile)
 {
 	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile)) {
-		regsubst(str, minification.pattern, minification.replacement);
+		regsubst(str, minification.pattern, minification.replacement, -1);
 		fputs(str, outfile);
 	}
 	return EXIT_SUCCESS;
@@ -185,12 +194,12 @@ optimize_file(FILE *infile, FILE *outfile)
 {
 	char str[BUFSIZE] = { 0 };
 	while (fgets(str, BUFSIZE, infile)) {
-		regsubst(str, minification.pattern, minification.replacement);
+		regsubst(str, minification.pattern, minification.replacement, -1);
 		// Repeat multiple times to make sure everything is optimized.
 		for (int iter = 0; iter < 5; ++iter)
 			for (size_t i = 0; i < len(optimizations); ++i)
 				regsubst(str, optimizations[i].pattern,
-					 optimizations[i].replacement);
+					 optimizations[i].replacement, -1);
 		fputs(str, outfile);
 	}
 	return EXIT_SUCCESS;
@@ -412,7 +421,7 @@ compile_file(FILE *infile, FILE *outfile)
 	while (fgets(str, BUFSIZE, infile)) {
 		for (size_t i = 0; i < len(compilation); ++i)
 			regsubst(str, compilation[i].pattern,
-				 compilation[i].replacement);
+				 compilation[i].replacement, -1);
 		fputs(str, outfile);
 	}
 	fprintf(outfile, "\treturn EXIT_SUCCESS;\n}\n");
