@@ -136,6 +136,7 @@ struct replacement {
         regmatch_t matchvar[10];                \
         regcomp(&regvar, __VA_ARGS__, 0);
 static bool
+// Check whether PREG is matching STR and put matches in PMATCH if so.
 regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
 	return success regexec(preg, str, 10, pmatch, 0);
@@ -241,6 +242,8 @@ struct command {
 	char command;
 };
 
+// Check whether a given PMATCH (part of regmatch_t array after regex
+// matching) is non-empty and thus present.
 static bool
 regpresent(regmatch_t *pmatch)
 {
