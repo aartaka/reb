@@ -135,7 +135,7 @@ static bool
 // Check whether PREG is matching STR and put matches in PMATCH if so.
 regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
-	return success regexec(preg, str, 10, pmatch, 0);
+	return success regexec(preg, str, (pmatch ? 10 : 0), pmatch, 0);
 }
 
 // Replace all the instance of PREG in STR with REPLACEMENT.
@@ -213,13 +213,13 @@ static int
 format_file(FILE *infile, FILE *outfile)
 {
 	regex_t blank_reg, normal_reg;
-	regmatch_t blank_matches[10], normal_matches[10];
+	regmatch_t normal_matches[10];
 	regcomp(&blank_reg, "^[[:space:]]*$", 0);
 	regcomp(&normal_reg, "^[[:space:]]*\\(.*\\)$", 0);
 	char str[BUFSIZE] = { 0 };
 	int depth = 0;
 	while (fgets(str, BUFSIZE, infile)) {
-		if (regmatch(&blank_reg, str, blank_matches)) {
+		if (regmatch(&blank_reg, str, NULL)) {
 			fputs("\n", outfile);
 		} else if (regmatch(&normal_reg, str, normal_matches)) {
 			char *buf = str;
