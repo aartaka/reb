@@ -131,8 +131,8 @@ struct replacement {
 }, minification = {"[^][+.,<>#-]", ""};
 // *INDENT-ON*
 
-static bool
 // Check whether PREG is matching STR and put matches in PMATCH if so.
+static bool
 regmatch(regex_t *preg, char *str, regmatch_t *pmatch)
 {
 	return success regexec(preg, str, (pmatch ? 10 : 0), pmatch, 0);
