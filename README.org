@@ -59,7 +59,7 @@ So you better split the stages and run the minified/optimized file when it's rea
 And then, you can also compile to C and use your favorite C compiler to get near-native speed:
 #+begin_src sh
   ./reb c file.min.bf > file.c
-  gcc file.c -o file
+  gcc file.c -O3 -o file
 #+end_src
 
 
